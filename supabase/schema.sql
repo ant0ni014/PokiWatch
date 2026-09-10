@@ -1,34 +1,23 @@
--- ==============================================================================
--- PokiWatch: Supabase Schema
--- Führe dieses SQL-Skript einfach im "SQL Editor" deines Supabase-Projekts aus.
--- ==============================================================================
+-- Supabase schema for PokiWatch (User-specific state)
 
--- 1. Tabelle für den synchronisierten Zustand (Watch-Status & Profile)
-CREATE TABLE IF NOT EXISTS public.pokiwatch_state (
-    id TEXT PRIMARY KEY DEFAULT 'global_state',
-    profiles JSONB NOT NULL DEFAULT '{
-        "trainer_1": {"id": "trainer_1", "name": "Ash", "avatar": "pikachu", "accentColor": "#ef4444"},
-        "trainer_2": {"id": "trainer_2", "name": "Gary", "avatar": "charizard", "accentColor": "#3b82f6"}
-    }'::jsonb,
-    watch_state JSONB NOT NULL DEFAULT '{}'::jsonb,
-    updated_at TIMESTAMPTZ DEFAULT now()
+CREATE TABLE IF NOT EXISTS public.pokiwatch_user_state (
+    user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    watch_state jsonb NOT NULL DEFAULT '{}'::jsonb,
+    profiles jsonb,
+    updated_at timestamp with time zone NOT NULL DEFAULT now()
 );
 
--- 2. Initialen Eintrag erzeugen (falls noch nicht vorhanden)
-INSERT INTO public.pokiwatch_state (id, watch_state)
-VALUES ('global_state', '{}'::jsonb)
-ON CONFLICT (id) DO NOTHING;
+-- Enable Row Level Security
+ALTER TABLE public.pokiwatch_user_state ENABLE ROW LEVEL SECURITY;
 
--- 3. Row Level Security (RLS) aktivieren & Lese-/Schreibzugriff für Anon erlauben
-ALTER TABLE public.pokiwatch_state ENABLE ROW LEVEL SECURITY;
+-- Allow each user to SELECT, INSERT, UPDATE only their own row
+CREATE POLICY "Allow user own access" ON public.pokiwatch_user_state
+    FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Allow user own insert" ON public.pokiwatch_user_state
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Allow user own update" ON public.pokiwatch_user_state
+    FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
-DROP POLICY IF EXISTS "Allow anon read & write to pokiwatch_state" ON public.pokiwatch_state;
-CREATE POLICY "Allow anon read & write to pokiwatch_state"
-    ON public.pokiwatch_state
-    FOR ALL
-    TO anon, authenticated
-    USING (true)
-    WITH CHECK (true);
-
--- 4. Realtime aktivieren (damit Änderungen sofort auf beiden Handys/PCs aufpoppen!)
-ALTER PUBLICATION supabase_realtime ADD TABLE public.pokiwatch_state;
+-- Grant usage to authenticated and anon roles (optional)
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE ON public.pokiwatch_user_state TO anon, authenticated;

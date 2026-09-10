@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { TrainerProfile, TrainerId } from "@/types";
+import { TrainerProfile, TrainerId, WatchStateMap } from "@/types";
 import { X, Check, User } from "lucide-react";
 
 interface ProfileEditModalProps {
@@ -10,6 +10,7 @@ interface ProfileEditModalProps {
     trainer_2: TrainerProfile;
   };
   activeTrainerId: TrainerId;
+  watchState?: WatchStateMap;
   onSelectActiveTrainer: (id: TrainerId) => void;
   onSaveProfiles: (updated: { trainer_1: TrainerProfile; trainer_2: TrainerProfile }) => void;
   onClose: () => void;
@@ -20,6 +21,7 @@ const AVAILABLE_AVATARS = ["🔴", "💧", "🔵", "⭐", "⚡", "🔥", "🌿",
 export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
   profiles,
   activeTrainerId,
+  watchState = {},
   onSelectActiveTrainer,
   onSaveProfiles,
   onClose
@@ -29,6 +31,54 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
 
   const [trainer2Name, setTrainer2Name] = useState(profiles.trainer_2.name);
   const [trainer2Avatar, setTrainer2Avatar] = useState(profiles.trainer_2.avatar);
+
+  // Compute stats and activity history
+  const { trainer1Count, trainer2Count, sharedCount, recentDays } = React.useMemo(() => {
+    let t1 = 0;
+    let t2 = 0;
+    let shared = 0;
+    const dayMap: Record<string, { t1: number; t2: number }> = {};
+
+    // Get last 7 days keys
+    const days: string[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().split("T")[0];
+      days.push(key);
+      dayMap[key] = { t1: 0, t2: 0 };
+    }
+
+    Object.values(watchState).forEach((rec) => {
+      if (rec.trainer_1) t1++;
+      if (rec.trainer_2) t2++;
+      if (rec.trainer_1 && rec.trainer_2) shared++;
+
+      if (rec.watchedAt_1) {
+        const dStr = rec.watchedAt_1.split("T")[0];
+        if (dayMap[dStr]) dayMap[dStr].t1++;
+      }
+      if (rec.watchedAt_2) {
+        const dStr = rec.watchedAt_2.split("T")[0];
+        if (dayMap[dStr]) dayMap[dStr].t2++;
+      }
+    });
+
+    const recentDaysFormatted = days.map((dateStr) => {
+      const d = new Date(dateStr + "T00:00:00");
+      const weekday = d.toLocaleDateString("de-DE", { weekday: "short" });
+      const dayNum = d.getDate();
+      return {
+        dateStr,
+        weekday,
+        dayNum,
+        t1: dayMap[dateStr]?.t1 || 0,
+        t2: dayMap[dateStr]?.t2 || 0
+      };
+    });
+
+    return { trainer1Count: t1, trainer2Count: t2, sharedCount: shared, recentDays: recentDaysFormatted };
+  }, [watchState]);
 
   const handleSave = () => {
     onSaveProfiles({
@@ -174,6 +224,55 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
                 {av}
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* Watch-Aktivität & Kalender (Verlauf) */}
+        <div className="p-4 rounded-2xl bg-slate-50 border-2 border-slate-200 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+              <span>📅</span> Letzte 7 Tage Watch-Aktivität
+            </span>
+            <span className="text-[11px] font-bold text-slate-500">
+              Gemeinsam: <strong className="text-emerald-600">{sharedCount}</strong> Folgen
+            </span>
+          </div>
+
+          <div className="grid grid-cols-7 gap-1.5 text-center">
+            {recentDays.map((day) => {
+              const hasActivity = day.t1 > 0 || day.t2 > 0;
+              return (
+                <div
+                  key={day.dateStr}
+                  className={`p-2 rounded-xl border flex flex-col items-center justify-between min-h-[58px] transition ${
+                    hasActivity
+                      ? "bg-amber-50 border-amber-300 shadow-xs"
+                      : "bg-white border-slate-200 opacity-60"
+                  }`}
+                >
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">{day.weekday}</span>
+                  <span className="text-xs font-black text-slate-800">{day.dayNum}</span>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    {day.t1 > 0 && (
+                      <span className="text-[9px] font-black text-amber-700 bg-amber-200/80 px-1 rounded">
+                        +{day.t1}
+                      </span>
+                    )}
+                    {day.t2 > 0 && (
+                      <span className="text-[9px] font-black text-blue-700 bg-blue-200/80 px-1 rounded">
+                        +{day.t2}
+                      </span>
+                    )}
+                    {!hasActivity && <span className="text-[10px] text-slate-300">-</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200/60 font-medium">
+            <span>{profiles.trainer_1.name}: <strong className="text-slate-800">{trainer1Count} gesamt</strong></span>
+            <span>{profiles.trainer_2.name}: <strong className="text-slate-800">{trainer2Count} gesamt</strong></span>
           </div>
         </div>
 

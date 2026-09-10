@@ -4,7 +4,7 @@ import React from "react";
 import { TrainerProfile, TrainerId } from "@/types";
 import { PokeballLogo } from "./PokeballLogo";
 import { PokedexIcon } from "./PokedexIcon";
-import { Database, UserCheck, RefreshCw, Smartphone } from "lucide-react";
+import { Database, UserCheck, RefreshCw } from "lucide-react";
 
 interface NavbarProps {
   profiles: {
@@ -26,8 +26,8 @@ interface NavbarProps {
   onForceSync: () => void;
   viewMode?: "grid" | "list";
   onToggleViewMode?: (mode: "grid" | "list") => void;
-  isEasyMode: boolean;
-  onToggleEasyMode: () => void;
+  isEasyMode?: boolean;
+  onToggleEasyMode?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -91,23 +91,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Right side: Easy Mode Switch, Playlist Sync, Grid/List & Trainer Switcher */}
+        {/* Right side: YouTube Playlist Sync, Supabase Status & Trainer Switcher */}
         <div className="flex items-center gap-1.5 sm:gap-2.5">
           
-          {/* Mobile Easy Mode Toggle (Visible prominently on phone!) */}
-          <button
-            onClick={onToggleEasyMode}
-            className={`flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-xl text-xs font-black transition border-2 shadow-sm ${
-              isEasyMode
-                ? "bg-amber-400 text-slate-950 border-amber-300 shadow-amber-950/20"
-                : "bg-red-800/80 text-white border-red-700"
-            }`}
-            title="Zwischen Easy Mode (Handy) und Detail-Modus wechseln"
-          >
-            <Smartphone className="w-3.5 h-3.5" />
-            <span className="text-[11px] sm:text-xs">{isEasyMode ? "Easy Mode" : "Detail-Modus"}</span>
-          </button>
-
           {/* YouTube Playlist Sync Button */}
           <button
             onClick={onOpenPlaylistModal}
@@ -222,14 +208,16 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </div>
 
-          {/* Direct YouTube Playlist Settings Button */}
+          {/* Direct YouTube Playlist Button */}
           <button
             onClick={onOpenPlaylistLinkModal}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition shadow-sm"
-            title="YouTube-Playlist Link für direkte Folgen-Wiedergabe konfigurieren"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black bg-red-600 hover:bg-red-700 text-white border border-red-500 shadow-sm transition active:scale-95"
+            title="YouTube-Playlist konfigurieren & öffnen"
           >
-            <span className="text-red-300 font-black">▶</span>
-            <span className="hidden xs:inline">Playlist-Link</span>
+            <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-white flex-shrink-0">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+            <span className="text-[11px] sm:text-xs">YouTube Playlist</span>
           </button>
 
         </div>

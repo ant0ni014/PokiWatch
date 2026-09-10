@@ -513,6 +513,7 @@ export default function Home() {
         <ProfileEditModal
           profiles={profiles}
           activeTrainerId={activeTrainerId}
+          watchState={watchState}
           onSelectActiveTrainer={handleSelectActiveTrainer}
           onSaveProfiles={handleSaveProfiles}
           onClose={() => setIsProfileModalOpen(false)}

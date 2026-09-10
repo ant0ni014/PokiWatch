@@ -56,32 +56,6 @@ export const EasyModeMobile: React.FC<EasyModeMobileProps> = ({
   return (
     <div className="space-y-3 sm:hidden">
       
-      {/* Mobile Easy Mode Banner & Instructions */}
-      <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-amber-400 flex-shrink-0 shadow-sm">
-            {activeProfile.image ? (
-              <img src={activeProfile.image} alt={activeProfile.name} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-amber-200 flex items-center justify-center font-bold">
-                {activeProfile.avatar}
-              </div>
-            )}
-          </div>
-          <div>
-            <div className="text-xs font-black text-amber-950 flex items-center gap-1.5">
-              <span>Easy Mode für {activeProfile.name}</span>
-              <span className="px-1.5 py-0.2 rounded bg-amber-400 text-[9px] font-black text-slate-950">
-                1-Tap
-              </span>
-            </div>
-            <p className="text-[10px] text-amber-800 font-semibold">
-              Pokemon Alle Staffel Und Folgen • 423 Videos
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Season Chips (Horizontal Swiper on Phone) */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
         {POKEMON_SEASONS.map((s) => (
