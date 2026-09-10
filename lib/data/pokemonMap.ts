@@ -1,0 +1,172 @@
+// Mapping of German and English Pokémon names to National Dex ID for official artwork
+export const POKEMON_DEX_MAP: Record<string, number> = {
+  // Generation 1 (Kanto)
+  "Bisasam": 1, "Bisaknosp": 2, "Bisaflor": 3,
+  "Glumanda": 4, "Glutexo": 5, "Glurak": 6,
+  "Schiggy": 7, "Schillok": 8, "Turtok": 9,
+  "Raupy": 10, "Safcon": 11, "Smettbo": 12,
+  "Hornliu": 13, "Kokuna": 14, "Bibor": 15,
+  "Taubsi": 16, "Tauboga": 17, "Tauboss": 18,
+  "Rattfratz": 19, "Rattikarl": 20,
+  "Habitak": 21, "Ibitak": 22,
+  "Rettan": 23, "Arbok": 24,
+  "Pikachu": 25, "Raichu": 26,
+  "Sandan": 27, "Sandamer": 28,
+  "Nidoran♀": 29, "Nidorina": 30, "Nidoqueen": 31,
+  "Nidoran♂": 32, "Nidorino": 33, "Nidoking": 34,
+  "Piepi": 35, "Pixi": 36,
+  "Vulpix": 37, "Vulnona": 38,
+  "Pummeluff": 39, "Knuddeluff": 40,
+  "Zubat": 41, "Golbat": 42,
+  "Myrapla": 43, "Duflor": 44, "Giflor": 45,
+  "Paras": 46, "Parasek": 47,
+  "Bluzuk": 48, "Omot": 49,
+  "Digda": 50, "Digdri": 51,
+  "Mauzi": 52, "Snobilikat": 53,
+  "Enton": 54, "Entoron": 55,
+  "Menki": 56, "Rasaff": 57,
+  "Fukano": 58, "Arkani": 59,
+  "Quapsel": 60, "Quaputzi": 61, "Quappo": 62,
+  "Abra": 63, "Kadabra": 64, "Simsala": 65,
+  "Machollo": 66, "Maschock": 67, "Machomei": 68,
+  "Knofensa": 69, "Ultrigaria": 70, "Sarzenia": 71,
+  "Tentacha": 72, "Tentoxa": 73,
+  "Kleinstein": 74, "Georok": 75, "Geowaz": 76,
+  "Ponita": 77, "Gallopa": 78,
+  "Flegmon": 79, "Lahmus": 80,
+  "Magnetilo": 81, "Magneton": 82,
+  "Porenta": 83,
+  "Dodu": 84, "Dodri": 85,
+  "Jurob": 86, "Jugong": 87,
+  "Sleima": 88, "Sleimok": 89,
+  "Muschas": 90, "Austos": 91,
+  "Nebulak": 92, "Alpollo": 93, "Gengar": 94,
+  "Onix": 95,
+  "Traumato": 96, "Hypno": 97,
+  "Krabby": 98, "Kingler": 99,
+  "Voltobal": 100, "Lektrobal": 101,
+  "Owei": 102, "Kokowei": 103,
+  "Tragosso": 104, "Knogga": 105,
+  "Kicklee": 106, "Nockchan": 107,
+  "Schlurpk": 108,
+  "Smogon": 109, "Smogmog": 110,
+  "Rihorn": 111, "Rizeros": 112,
+  "Chaneira": 113,
+  "Tangela": 114,
+  "Kangama": 115,
+  "Seeper": 116, "Seemon": 117,
+  "Goldini": 118, "Golking": 119,
+  "Sterndu": 120, "Starmie": 121,
+  "Pantimos": 122,
+  "Sichlor": 123,
+  "Rossana": 124,
+  "Eletek": 125,
+  "Magmar": 126,
+  "Pinsir": 127,
+  "Tauros": 128,
+  "Karpador": 129, "Garados": 130,
+  "Lapras": 131,
+  "Ditto": 132,
+  "Evoli": 133, "Aquana": 134, "Blitza": 135, "Flamara": 136,
+  "Porygon": 137,
+  "Amonitas": 138, "Amoroso": 139,
+  "Kabuto": 140, "Kabutops": 141,
+  "Aerodactyl": 142,
+  "Relaxo": 143,
+  "Arktos": 144, "Zapdos": 145, "Lavados": 146,
+  "Dratini": 147, "Dragonir": 148, "Dragoran": 149,
+  "Mewtu": 150, "Mew": 151,
+
+  // Generation 2 (Johto)
+  "Endivie": 152, "Lorblatt": 153, "Meganie": 154,
+  "Feurigel": 155, "Igelavar": 156, "Tornupto": 157,
+  "Karnimani": 158, "Tyracroc": 159, "Impergator": 160,
+  "Wiesor": 161, "Wiesenior": 162,
+  "Hoothoot": 163, "Noctuh": 164,
+  "Ledyba": 165, "Ledian": 166,
+  "Webarak": 167, "Ariados": 168,
+  "Crobat": 169,
+  "Lampi": 170, "Lanturn": 171,
+  "Pichu": 172, "Pii": 173, "Fluffeluff": 174,
+  "Togepi": 175, "Togetic": 176,
+  "Natu": 177, "Xatu": 178,
+  "Voltilamm": 179, "Waaty": 180, "Ampharos": 181,
+  "Blubella": 182, "Marill": 183, "Azumarill": 184,
+  "Mogelbaum": 185, "Quaxo": 186,
+  "Hoppspross": 187, "Hubelupf": 188, "Papungha": 189,
+  "Griffel": 190, "Sonnkern": 191, "Sonnflora": 192,
+  "Yanma": 193, "Felino": 194, "Morlord": 195,
+  "Psiana": 196, "Nachtara": 197,
+  "Kramurx": 198, "Laschoking": 199,
+  "Traunfugil": 200, "Icognito": 201,
+  "Woingenau": 202, "Girafarig": 203,
+  "Tannza": 204, "Forstellka": 205,
+  "Dummisel": 206, "Skorgla": 207, "Stahlos": 208,
+  "Snubbull": 209, "Granbull": 210,
+  "Baldorfish": 211, "Scherox": 212,
+  "Pottrott": 213, "Skaraborn": 214,
+  "Sniebel": 215, "Teddiursa": 216, "Ursaring": 217,
+  "Schneckmag": 218, "Magcargo": 219,
+  "Quiekel": 220, "Keifel": 221,
+  "Corasonn": 222, "Remoraid": 223, "Octillery": 224,
+  "Botogel": 225, "Panzaeron": 227,
+  "Hunduster": 228, "Hundemon": 229,
+  "Seedraking": 230, "Phanpy": 231, "Donphan": 232,
+  "Porygon2": 233, "Damhirplex": 234, "Farbeagle": 235,
+  "Rabauz": 236, "Kapoera": 237,
+  "Kussilla": 238, "Elekid": 239, "Magby": 240,
+  "Miltank": 241, "Heiteira": 242,
+  "Raikou": 243, "Entei": 244, "Suicune": 245,
+  "Larvitar": 246, "Pupitar": 247, "Despotar": 248,
+  "Lugia": 249, "Ho-Oh": 250, "Celebi": 251,
+
+  // Generation 3 (Hoenn)
+  "Geckarbor": 252, "Reptain": 253, "Gewaldro": 254,
+  "Flemmli": 255, "Jungglut": 256, "Lohgock": 257,
+  "Hydropi": 258, "Moorabbel": 259, "Sumpex": 260,
+  "Schwalbini": 276, "Schwalboss": 277,
+  "Krebscorps": 341, "Krebutack": 342,
+  "Qurtel": 324, "Regice": 378, "Registeel": 379, "Regirock": 377,
+
+  // Generation 4 (Sinnoh)
+  "Chelast": 387, "Chelcarain": 388, "Chelterrar": 389,
+  "Panflam": 390, "Panpyro": 391, "Panferno": 392,
+  "Plinfa": 393, "Pliprin": 394, "Impoleon": 395,
+  "Staralili": 396, "Staravia": 397, "Staraptor": 398,
+  "Sheinux": 403, "Luxio": 404, "Luxtra": 405,
+  "Knospi": 406, "Roserade": 407,
+  "Kranidos": 408, "Rameidon": 409,
+  "Burmy": 412, "Burmadame": 413, "Moterpel": 414,
+  "Wadribie": 415, "Honweisel": 416,
+  "Pachirisu": 417, "Bamelin": 418, "Bojelin": 419,
+  "Kinoso": 421,
+  "Driftlon": 425, "Drifzepeli": 426,
+  "Charmian": 431, "Shnurgarst": 432,
+  "Mobai": 438,
+  "Kaumalat": 443, "Knarksel": 444, "Knakrack": 445,
+  "Lucario": 448,
+  "Glibunkel": 453, "Toxiquak": 454,
+  "Vesprit": 481, "Selfe": 480, "Tobutz": 482
+};
+
+/**
+ * Returns National Dex ID for a given Pokémon name
+ */
+export function getPokemonDexId(name: string): number | null {
+  const cleanName = name.replace(/\s*\(.*?\)\s*/g, "").trim();
+  return POKEMON_DEX_MAP[cleanName] || null;
+}
+
+/**
+ * Returns the high-resolution official artwork image URL for a Pokémon name
+ */
+export function getPokemonArtworkUrl(name: string): string | null {
+  // Clean special characters like "(Pink)" or "(Kristall)"
+  const cleanName = name.replace(/\s*\(.*?\)\s*/g, "").trim();
+  const dexId = POKEMON_DEX_MAP[cleanName];
+
+  if (dexId) {
+    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${dexId}.png`;
+  }
+  return null;
+}
