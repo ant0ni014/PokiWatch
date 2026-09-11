@@ -614,7 +614,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t-2 border-slate-200 bg-white py-5 text-center text-xs text-slate-600 mt-auto">
         <p className="font-bold text-slate-800">
-          Von Antonio Pham Ngoc erstellt
+          PokiWatch von Antonio Pham Ngoc
         </p>
       </footer>
       </div>
