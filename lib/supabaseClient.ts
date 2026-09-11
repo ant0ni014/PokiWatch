@@ -34,13 +34,21 @@ export function getSupabaseClient(): SupabaseClient | null {
     return null;
   }
 
-  const keySignature = `${creds.url}_${creds.anonKey}`;
+  // Sanitize URL: ensure no trailing slashes or accidentally pasted subpaths
+  let cleanUrl = creds.url.trim();
+  cleanUrl = cleanUrl.replace(/\/+$/, '');
+  if (cleanUrl.endsWith('/rest/v1')) {
+    cleanUrl = cleanUrl.replace(/\/rest\/v1$/, '');
+  }
+
+  const cleanKey = creds.anonKey.trim();
+  const keySignature = `${cleanUrl}_${cleanKey}`;
   if (cachedClient && currentKey === keySignature) {
     return cachedClient;
   }
 
   try {
-    cachedClient = createClient(creds.url, creds.anonKey, {
+    cachedClient = createClient(cleanUrl, cleanKey, {
       auth: { persistSession: true },
       realtime: { params: { eventsPerSecond: 10 } }
     });
