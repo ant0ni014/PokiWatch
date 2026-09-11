@@ -1,8 +1,1 @@
-﻿{
-  "crons": [
-    {
-      "path": "/api/sync-playlist",
-      "schedule": "0 4 * * *"
-    }
-  ]
-}
+{"crons":[{"path":"/api/sync-playlist","schedule":"0 4 * * *"}]}
