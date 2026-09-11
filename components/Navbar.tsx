@@ -93,9 +93,20 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Right side: Active Trainer & Logout */}
+        {/* Right side: YouTube Playlist Button, Active Trainer & Logout */}
         <div className="flex items-center gap-1.5 sm:gap-2.5">
 
+          {/* Direct YouTube Playlist Button next to Ash */}
+          <button
+            onClick={onOpenPlaylistLinkModal}
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-red-700/80 hover:bg-red-800 text-white text-xs font-black border border-red-500/50 shadow-sm transition active:scale-95 flex-shrink-0"
+            title="YouTube-Playlist konfigurieren & öffnen"
+          >
+            <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-white flex-shrink-0">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+            <span className="text-[11px] sm:text-xs">Playlist</span>
+          </button>
 
           {/* Supabase Status / Setup Button (Hidden for clean look, accessible via profile or settings) */}
           <button
@@ -158,69 +169,55 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       </div>
 
-      {/* Category Tab Bar (Episoden vs. Gemeinsamer Pokédex) */}
+      {/* Category Tab Bar (Episoden vs. Gemeinsamer Pokédex vs. Aktivität) */}
       <div className="bg-red-900/60 backdrop-blur-md border-t border-red-500/30 px-3 sm:px-6 lg:px-8 py-1.5 shadow-inner">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
+        <div className="max-w-7xl mx-auto flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none py-0.5">
           
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <button
-              onClick={() => onChangeTab("episodes")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
-                activeTab === "episodes"
-                  ? "bg-white text-red-700 shadow-md scale-100"
-                  : "text-white/90 hover:bg-white/10 hover:text-white"
-              }`}
-            >
-              <span>📺 Episoden</span>
-            </button>
-
-            <button
-              onClick={() => onChangeTab("pokedex")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
-                activeTab === "pokedex"
-                  ? "bg-amber-400 text-slate-950 shadow-md scale-100"
-                  : "text-white/90 hover:bg-white/10 hover:text-white"
-              }`}
-            >
-              <PokedexIcon size="sm" />
-              <span>Gemeinsamer Pokédex</span>
-              {typeof discoveredCount === "number" && (
-                <span
-                  className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${
-                    activeTab === "pokedex"
-                      ? "bg-slate-950 text-amber-300"
-                      : "bg-white/20 text-white"
-                  }`}
-                >
-                  {discoveredCount}
-                  {totalPokemonCount ? ` / ${totalPokemonCount}` : ""}
-                </span>
-              )}
-            </button>
-
-            <button
-              onClick={() => onChangeTab("activity")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
-                activeTab === "activity"
-                  ? "bg-indigo-500 text-white shadow-md scale-100"
-                  : "text-white/90 hover:bg-white/10 hover:text-white"
-              }`}
-            >
-              <Flame className="w-3.5 h-3.5 text-amber-300" />
-              <span>Aktivität</span>
-            </button>
-          </div>
-
-          {/* Direct YouTube Playlist Button */}
           <button
-            onClick={onOpenPlaylistLinkModal}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black bg-red-600 hover:bg-red-700 text-white border border-red-500 shadow-sm transition active:scale-95"
-            title="YouTube-Playlist konfigurieren & öffnen"
+            onClick={() => onChangeTab("episodes")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all flex-shrink-0 ${
+              activeTab === "episodes"
+                ? "bg-white text-red-700 shadow-md scale-100"
+                : "text-white/90 hover:bg-white/10 hover:text-white"
+            }`}
           >
-            <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-white flex-shrink-0">
-              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-            </svg>
-            <span className="text-[11px] sm:text-xs">YouTube Playlist</span>
+            <span>📺 Episoden</span>
+          </button>
+
+          <button
+            onClick={() => onChangeTab("pokedex")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all flex-shrink-0 ${
+              activeTab === "pokedex"
+                ? "bg-amber-400 text-slate-950 shadow-md scale-100"
+                : "text-white/90 hover:bg-white/10 hover:text-white"
+            }`}
+          >
+            <PokedexIcon size="sm" />
+            <span>Gemeinsamer Pokédex</span>
+            {typeof discoveredCount === "number" && (
+              <span
+                className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${
+                  activeTab === "pokedex"
+                    ? "bg-slate-950 text-amber-300"
+                    : "bg-white/20 text-white"
+                }`}
+              >
+                {discoveredCount}
+                {totalPokemonCount ? ` / ${totalPokemonCount}` : ""}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => onChangeTab("activity")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all flex-shrink-0 ${
+              activeTab === "activity"
+                ? "bg-indigo-500 text-white shadow-md scale-100"
+                : "text-white/90 hover:bg-white/10 hover:text-white"
+            }`}
+          >
+            <Flame className="w-3.5 h-3.5 text-amber-300" />
+            <span>Aktivität</span>
           </button>
 
         </div>
