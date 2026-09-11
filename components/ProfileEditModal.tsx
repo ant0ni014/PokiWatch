@@ -102,29 +102,32 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-lg rounded-3xl bg-white border-2 border-slate-200 shadow-2xl p-6 sm:p-7 text-slate-900 space-y-6"
+        className="relative w-full max-w-lg max-h-[88vh] flex flex-col rounded-3xl bg-white border-2 border-slate-200 shadow-2xl text-slate-900 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         
-        {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+        {/* Header (Sticky at top) */}
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-200 bg-white sticky top-0 z-10">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-red-600 text-white flex items-center justify-center font-bold">
+            <div className="w-7 h-7 rounded-xl bg-red-600 text-white flex items-center justify-center font-bold">
               <User className="w-4 h-4" />
             </div>
-            <h2 className="text-lg font-black text-slate-900">
+            <h2 className="text-base font-black text-slate-900">
               Trainer-Profile anpassen
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl bg-slate-100 text-slate-500 hover:text-slate-800 transition"
+            className="p-1 rounded-xl bg-slate-100 text-slate-500 hover:text-slate-800 transition"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Scrollable Body */}
+        <div className="p-4 sm:p-5 overflow-y-auto space-y-4 text-xs">
 
         {/* Who is watching on this device? */}
         <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-200 space-y-2">
@@ -305,8 +308,10 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
           </div>
         </div>
 
-        {/* Footer Buttons */}
-        <div className="flex items-center justify-end gap-3 pt-2">
+        </div>
+
+        {/* Footer Buttons (Sticky at bottom) */}
+        <div className="flex items-center justify-end gap-3 px-5 py-3 border-t border-slate-200 bg-white sticky bottom-0 z-10">
           <button
             onClick={onClose}
             className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-800"
@@ -315,7 +320,7 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
           </button>
           <button
             onClick={handleSave}
-            className="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-black shadow-md transition"
+            className="px-6 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-black shadow-md transition"
           >
             Speichern
           </button>
