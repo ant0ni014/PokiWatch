@@ -287,26 +287,6 @@ export const EpisodeDetailModal: React.FC<EpisodeDetailModalProps> = ({
             </>
           )}
 
-          {/* In-App Player Preview */}
-          <div className="pt-2">
-            <details className="group rounded-2xl border-2 border-slate-200 p-3 bg-slate-50">
-              <summary className="text-xs font-black text-slate-700 cursor-pointer flex items-center justify-between">
-                <span>In-App Vorschau-Player anzeigen</span>
-                <span className="text-xs text-slate-400 group-open:rotate-180 transition">▼</span>
-              </summary>
-              <div className="mt-3">
-                <EmbeddedPlayer
-                  episodeId={episode.id}
-                  titleDe={episode.titleDe}
-                  titleEn={episode.titleEn}
-                  youtubeId={episode.youtubeId}
-                  onAutoWatched={() => onToggleWatch(episode.id, activeTrainerId)}
-                  isAlreadyWatched={activeWatched}
-                />
-              </div>
-            </details>
-          </div>
-
         </div>
 
       </div>

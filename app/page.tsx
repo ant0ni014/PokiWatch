@@ -16,6 +16,7 @@ import { SupabaseSetupModal } from "@/components/SupabaseSetupModal";
 import { PlaylistSyncModal } from "@/components/PlaylistSyncModal";
 import { PlaylistLinkModal } from "@/components/PlaylistLinkModal";
 import { PokedexView } from "@/components/PokedexView";
+import { ActivityView } from "@/components/ActivityView";
 import { getAllEpisodes } from "@/lib/data/episodes";
 import { calculateSharedPokedex } from "@/lib/data/pokedex";
 import { getSavedPlaylistId, DEFAULT_PLAYLIST_ID } from "@/lib/playlist";
@@ -40,8 +41,8 @@ export default function Home() {
   const [deviceTrainerChosen, setDeviceTrainerChosen] = useState(false);
   const [watchState, setWatchState] = useState<WatchStateMap>({});
 
-  // Active Category Tab: 'episodes' | 'pokedex'
-  const [activeTab, setActiveTab] = useState<"episodes" | "pokedex">("episodes");
+  // Active Category Tab: 'episodes' | 'pokedex' | 'activity'
+  const [activeTab, setActiveTab] = useState<"episodes" | "pokedex" | "activity">("episodes");
 
   // View mode & Easy Mode
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
@@ -507,6 +508,12 @@ export default function Home() {
             onSelectEpisode={(ep) => setSelectedEpisode(ep)}
             onSwitchToEpisodesTab={() => setActiveTab("episodes")}
           />
+        ) : activeTab === "activity" ? (
+          /* Gemeinsame Watch-Aktivität Tab */
+          <ActivityView
+            watchState={watchState}
+            profiles={profiles}
+          />
         ) : (
           /* Normal Episodes Tracking Tab */
           <>
@@ -585,10 +592,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t-2 border-slate-200 bg-white py-5 text-center text-xs text-slate-600 mt-auto">
         <p className="font-bold text-slate-800">
-          PokiWatch – Pokédex Watch-Tracker für YouTube
-        </p>
-        <p className="text-[11px] mt-0.5 text-slate-500">
-          Mobile-First • 2-Trainer Synchronisation • Gemeinsamer Pokédex • Spoiler-Schutz
+          Von Antonio Pham Ngoc erstellt
         </p>
       </footer>
 

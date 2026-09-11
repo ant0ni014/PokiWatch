@@ -4,7 +4,7 @@ import React from "react";
 import { TrainerProfile, TrainerId } from "@/types";
 import { PokeballLogo } from "./PokeballLogo";
 import { PokedexIcon } from "./PokedexIcon";
-import { Database, UserCheck, RefreshCw, LogIn, LogOut, ShieldCheck } from "lucide-react";
+import { Database, UserCheck, RefreshCw, LogIn, LogOut, ShieldCheck, Flame } from "lucide-react";
 
 interface NavbarProps {
   profiles: {
@@ -12,8 +12,8 @@ interface NavbarProps {
     trainer_2: TrainerProfile;
   };
   activeTrainerId: TrainerId;
-  activeTab: "episodes" | "pokedex";
-  onChangeTab: (tab: "episodes" | "pokedex") => void;
+  activeTab: "episodes" | "pokedex" | "activity";
+  onChangeTab: (tab: "episodes" | "pokedex" | "activity") => void;
   discoveredCount?: number;
   totalPokemonCount?: number;
   onSelectActiveTrainer: (id: TrainerId) => void;
@@ -93,20 +93,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Right side: YouTube Playlist Sync, Supabase Status & Trainer Switcher */}
+        {/* Right side: Active Trainer & Logout */}
         <div className="flex items-center gap-1.5 sm:gap-2.5">
-          
-          {/* YouTube Playlist Sync Button */}
-          <button
-            onClick={onOpenPlaylistModal}
-            className="flex items-center gap-1 p-1.5 sm:px-2.5 sm:py-1 rounded-xl bg-red-700 hover:bg-red-800 text-white border border-red-500/40 text-xs font-bold transition shadow-sm"
-            title="YouTube Playlist synchronisieren"
-          >
-            <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-white flex-shrink-0">
-              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-            </svg>
-            <span className="hidden lg:inline text-[11px]">Playlist Sync</span>
-          </button>
 
 
           {/* Supabase Status / Setup Button (Hidden for clean look, accessible via profile or settings) */}
@@ -208,6 +196,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {totalPokemonCount ? ` / ${totalPokemonCount}` : ""}
                 </span>
               )}
+            </button>
+
+            <button
+              onClick={() => onChangeTab("activity")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                activeTab === "activity"
+                  ? "bg-indigo-500 text-white shadow-md scale-100"
+                  : "text-white/90 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <Flame className="w-3.5 h-3.5 text-amber-300" />
+              <span>Aktivität</span>
             </button>
           </div>
 
