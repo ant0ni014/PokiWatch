@@ -43,7 +43,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
       });
 
       if (signInError) {
-        setError('Ungültiger Benutzername oder falsches Passwort.');
+        setError(signInError.message || 'Ungültiger Benutzername oder falsches Passwort.');
       } else if (data?.user) {
         onLoginSuccess(data.user);
         onClose();
