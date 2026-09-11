@@ -454,7 +454,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pokeball-bg-pattern text-slate-900 flex flex-col selection:bg-red-500 selection:text-white">
+    <div className="h-dvh max-h-dvh overflow-hidden bg-[#f8fafc] pokeball-bg-pattern text-slate-900 flex flex-col selection:bg-red-500 selection:text-white">
       
       {/* Toast Banner */}
       {toastMessage && (
@@ -494,8 +494,9 @@ export default function Home() {
         }}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
+      {/* Scrollable Main Area (starts strictly BELOW the red Navbar so scrollbar never touches the red header) */}
+      <div className="flex-1 overflow-y-auto min-h-0 flex flex-col">
+        <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
         
         {/* Unlinked Playlist Alert Banner */}
         {!playlistId && (
@@ -616,6 +617,7 @@ export default function Home() {
           Von Antonio Pham Ngoc erstellt
         </p>
       </footer>
+      </div>
 
       {/* Modals */}
       <EpisodeDetailModal

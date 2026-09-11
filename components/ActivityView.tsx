@@ -4,12 +4,11 @@ import React, { useState, useMemo } from "react";
 import { WatchStateMap, TrainerProfile } from "@/types";
 import {
   Calendar as CalendarIcon,
-  Flame,
   ChevronLeft,
   ChevronRight,
   RotateCcw,
   Film,
-  X
+  Sparkles
 } from "lucide-react";
 
 interface ActivityViewProps {
@@ -26,7 +25,17 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
 }) => {
   // Navigation state for the Monthly Calendar
   const [viewDate, setViewDate] = useState<Date>(() => new Date());
-  const [selectedDayKey, setSelectedDayKey] = useState<string | null>(null);
+
+  // Default selected day to today
+  const todayStr = useMemo(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  }, []);
+
+  const [selectedDayKey, setSelectedDayKey] = useState<string>(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  });
 
   // Aggregate watch data from watchState into day-indexed entries
   const { dayMap, trainer1Total, trainer2Total, sharedTotal } = useMemo(() => {
@@ -72,28 +81,6 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
     };
   }, [watchState]);
 
-  // Last 14 days quick overview
-  const daysList14 = useMemo(() => {
-    const weekdayNames = ["SO", "MO", "DI", "MI", "DO", "FR", "SA"];
-    const list = [];
-    for (let i = 13; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const key = d.toISOString().split("T")[0];
-      const data = dayMap[key] || { t1: 0, t2: 0, t1Episodes: [], t2Episodes: [] };
-      list.push({
-        dateStr: key,
-        weekday: weekdayNames[d.getDay()],
-        dayNum: d.getDate(),
-        monthStr: d.toLocaleDateString("de-DE", { month: "short" }),
-        t1: data.t1,
-        t2: data.t2,
-        total: data.t1 + data.t2
-      });
-    }
-    return list;
-  }, [dayMap]);
-
   // Calendar month grid calculation
   const monthGrid = useMemo(() => {
     const year = viewDate.getFullYear();
@@ -133,7 +120,6 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
 
     // Current month cells
     const now = new Date();
-    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
     let monthT1 = 0;
     let monthT2 = 0;
 
@@ -188,7 +174,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
       monthT2,
       isCurrentMonthView
     };
-  }, [viewDate, dayMap]);
+  }, [viewDate, dayMap, todayStr]);
 
   // Month navigation handlers
   const handlePrevMonth = () => {
@@ -201,10 +187,21 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
 
   const handleToday = () => {
     setViewDate(new Date());
+    setSelectedDayKey(todayStr);
   };
 
   // Selected day details
-  const selectedDayData = selectedDayKey ? dayMap[selectedDayKey] : null;
+  const selectedDayData = dayMap[selectedDayKey] || {
+    t1: 0,
+    t2: 0,
+    t1Episodes: [],
+    t2Episodes: []
+  };
+
+  const selectedDayDateObj = useMemo(() => {
+    if (!selectedDayKey) return new Date();
+    return new Date(selectedDayKey + "T00:00:00");
+  }, [selectedDayKey]);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -263,7 +260,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
                 {monthGrid.monthName}
               </h3>
               <p className="text-xs text-slate-500 font-semibold">
-                Monatsübersicht & Historie
+                Klicke auf einen Tag, um die Aktivität einzusehen
               </p>
             </div>
           </div>
@@ -274,7 +271,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
               <button
                 onClick={handleToday}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition active:scale-95 cursor-pointer"
-                title="Zum aktuellen Monat springen"
+                title="Zum heutigen Tag springen"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Heute</span>
@@ -290,7 +287,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
                 <ChevronLeft className="w-4 h-4" />
               </button>
 
-              <span className="px-3 text-xs font-black text-slate-700 min-w-[90px] text-center capitalize">
+              <span className="px-3 text-xs font-black text-slate-700 min-w-[95px] text-center capitalize">
                 {viewDate.toLocaleDateString("de-DE", { month: "short", year: "numeric" })}
               </span>
 
@@ -308,7 +305,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
         {/* Monthly Activity Summary Pill */}
         <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200/80 text-xs font-bold">
           <span className="text-slate-500">
-            Aktivität im <strong className="text-slate-800 capitalize">{monthGrid.monthName}</strong>:
+            Gesamt im <strong className="text-slate-800 capitalize">{monthGrid.monthName}</strong>:
           </span>
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5 text-slate-700">
@@ -323,7 +320,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
         </div>
 
         {/* Days of Week Header */}
-        <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center border-b border-slate-100 pb-2">
+        <div className="grid grid-cols-7 gap-1.5 sm:gap-2 text-center border-b border-slate-100 pb-2">
           {["MO", "DI", "MI", "DO", "FR", "SA", "SO"].map((dayName) => (
             <div
               key={dayName}
@@ -334,8 +331,8 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
           ))}
         </div>
 
-        {/* 7-Column Month Grid */}
-        <div className="grid grid-cols-7 gap-1 sm:gap-2">
+        {/* 7-Column Month Grid - EVERY day is clickable! */}
+        <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
           {monthGrid.cells.map((cell) => {
             const hasActivity = cell.data.t1 > 0 || cell.data.t2 > 0;
             const isSelected = selectedDayKey === cell.dateStr;
@@ -343,29 +340,26 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
             return (
               <button
                 key={cell.dateStr}
-                onClick={() => {
-                  if (hasActivity) {
-                    setSelectedDayKey((prev) => (prev === cell.dateStr ? null : cell.dateStr));
-                  }
-                }}
-                disabled={!hasActivity}
-                className={`p-1.5 sm:p-2.5 rounded-2xl border-2 flex flex-col items-center justify-between min-h-[75px] sm:min-h-[90px] transition text-left relative ${
-                  !cell.isCurrentMonth
-                    ? "bg-slate-50/50 border-slate-100 opacity-40"
+                onClick={() => setSelectedDayKey(cell.dateStr)}
+                className={`p-1.5 sm:p-2.5 rounded-2xl border-2 flex flex-col items-center justify-between min-h-[76px] sm:min-h-[88px] transition text-left relative cursor-pointer active:scale-95 ${
+                  isSelected
+                    ? "border-indigo-600 bg-indigo-50/80 ring-2 ring-indigo-500/30 shadow-sm"
                     : cell.isToday
-                    ? "border-indigo-500 bg-indigo-50/60 shadow-xs ring-2 ring-indigo-500/20"
-                    : isSelected
-                    ? "border-purple-600 bg-purple-50 ring-2 ring-purple-500/20"
+                    ? "border-indigo-400/80 bg-indigo-50/30"
+                    : !cell.isCurrentMonth
+                    ? "bg-slate-50/40 border-slate-100 opacity-40 hover:opacity-75"
                     : hasActivity
-                    ? "bg-slate-50 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/30 cursor-pointer"
-                    : "bg-white border-slate-100 text-slate-400 opacity-70"
+                    ? "bg-white border-slate-200 hover:border-indigo-300 hover:bg-slate-50"
+                    : "bg-white border-slate-100 hover:border-slate-200 hover:bg-slate-50/50"
                 }`}
               >
                 {/* Top Row: Day Number & Today indicator */}
                 <div className="w-full flex items-center justify-between">
                   <span
                     className={`text-xs sm:text-sm font-black ${
-                      cell.isToday
+                      isSelected
+                        ? "text-indigo-900"
+                        : cell.isToday
                         ? "text-indigo-600"
                         : cell.isCurrentMonth
                         ? "text-slate-800"
@@ -375,7 +369,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
                     {cell.dayNum}
                   </span>
                   {cell.isToday && (
-                    <span className="text-[8px] sm:text-[9px] font-black px-1.5 py-0.5 rounded-full bg-indigo-600 text-white uppercase">
+                    <span className="text-[7px] sm:text-[8px] font-black px-1.5 py-0.5 rounded-full bg-indigo-600 text-white uppercase">
                       Heute
                     </span>
                   )}
@@ -393,164 +387,119 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
                       +{cell.data.t2}
                     </div>
                   )}
-                  {!hasActivity && cell.isCurrentMonth && (
+                  {!hasActivity && (
                     <span className="text-[9px] text-slate-300 block text-center">-</span>
                   )}
                 </div>
 
-                {/* Bottom hint for clickable days */}
-                {hasActivity && (
-                  <span className="text-[8px] font-semibold text-indigo-500 hidden sm:block">
-                    Details
-                  </span>
-                )}
+                {/* Subtle active indicator dot */}
+                <div className="w-full flex justify-center">
+                  {isSelected ? (
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
+                  ) : hasActivity ? (
+                    <span className="w-1 h-1 rounded-full bg-slate-300" />
+                  ) : (
+                    <span className="w-1 h-1 opacity-0" />
+                  )}
+                </div>
               </button>
             );
           })}
         </div>
 
-        {/* Selected Day Detail Card */}
-        {selectedDayKey && selectedDayData && (
-          <div className="mt-4 p-4 rounded-2xl bg-indigo-50/90 border-2 border-indigo-200 text-slate-800 space-y-3 animate-in slide-in-from-top-2 duration-200">
-            <div className="flex items-center justify-between pb-2 border-b border-indigo-200/60">
-              <div className="flex items-center gap-2">
-                <Film className="w-4 h-4 text-indigo-600" />
-                <h4 className="text-sm font-black text-indigo-950">
-                  Aktivität am{" "}
-                  {new Date(selectedDayKey + "T00:00:00").toLocaleDateString("de-DE", {
+        {/* Selected Day Detail Box (Always shows stats for the clicked day) */}
+        <div className="mt-4 p-4 sm:p-5 rounded-2xl bg-slate-50 border-2 border-indigo-200/80 text-slate-800 space-y-3.5 animate-in fade-in duration-200 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-200">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
+                <Film className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-[10px] font-black uppercase text-indigo-600 tracking-wider block">
+                  Tagesaktivität
+                </span>
+                <h4 className="text-sm sm:text-base font-black text-slate-900">
+                  {selectedDayDateObj.toLocaleDateString("de-DE", {
                     weekday: "long",
                     day: "2-digit",
                     month: "long",
                     year: "numeric"
                   })}
+                  {selectedDayKey === todayStr && (
+                    <span className="ml-2 text-[10px] font-black text-indigo-600 uppercase bg-indigo-100 px-2 py-0.5 rounded-full">
+                      Heute
+                    </span>
+                  )}
                 </h4>
               </div>
-              <button
-                onClick={() => setSelectedDayKey(null)}
-                className="p-1 rounded-lg hover:bg-indigo-100 text-indigo-700 transition cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              {/* Trainer 1 detail */}
-              <div className="p-3 bg-white rounded-xl border border-amber-200 space-y-1">
-                <div className="flex items-center gap-1.5 font-black text-amber-700">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                  <span>{profiles.trainer_1.name}</span>
-                  <span className="ml-auto text-amber-600 font-bold">
-                    {selectedDayData.t1} {selectedDayData.t1 === 1 ? "Folge" : "Folgen"}
-                  </span>
-                </div>
-                {selectedDayData.t1Episodes.length > 0 ? (
-                  <p className="text-slate-600 font-medium pt-1">
-                    Folgen: <strong className="text-slate-900">#{selectedDayData.t1Episodes.join(", #")}</strong>
-                  </p>
-                ) : (
-                  <p className="text-slate-400 italic pt-1">Keine Folgen an diesem Tag</p>
-                )}
-              </div>
-
-              {/* Trainer 2 detail */}
-              <div className="p-3 bg-white rounded-xl border border-orange-200 space-y-1">
-                <div className="flex items-center gap-1.5 font-black text-orange-700">
-                  <span className="w-2.5 h-2.5 rounded-full bg-orange-500" />
-                  <span>{profiles.trainer_2.name}</span>
-                  <span className="ml-auto text-orange-600 font-bold">
-                    {selectedDayData.t2} {selectedDayData.t2 === 1 ? "Folge" : "Folgen"}
-                  </span>
-                </div>
-                {selectedDayData.t2Episodes.length > 0 ? (
-                  <p className="text-slate-600 font-medium pt-1">
-                    Folgen: <strong className="text-slate-900">#{selectedDayData.t2Episodes.join(", #")}</strong>
-                  </p>
-                ) : (
-                  <p className="text-slate-400 italic pt-1">Keine Folgen an diesem Tag</p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* 14 Days Quick Glance Bar */}
-      <div className="bg-white rounded-3xl border-2 border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-600 flex items-center justify-center font-bold">
-              <Flame className="w-4 h-4 text-indigo-600" />
-            </div>
-            <div>
-              <h3 className="text-sm font-black text-slate-900">Verlauf der letzten 14 Tage</h3>
-              <p className="text-[11px] text-slate-500 font-semibold">
-                Kompakte Ansicht der jüngsten Folgen
-              </p>
+            <div className="text-xs font-bold text-slate-500">
+              Gesamt an diesem Tag:{" "}
+              <strong className="text-slate-900 text-sm">
+                {selectedDayData.t1 + selectedDayData.t2}
+              </strong>{" "}
+              {selectedDayData.t1 + selectedDayData.t2 === 1 ? "Folge" : "Folgen"}
             </div>
           </div>
 
-          {/* Legend */}
-          <div className="flex items-center gap-3 text-[11px] font-bold">
-            <span className="flex items-center gap-1 text-slate-600">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-              {profiles.trainer_1.name}
-            </span>
-            <span className="flex items-center gap-1 text-slate-600">
-              <span className="w-2.5 h-2.5 rounded-full bg-orange-500" />
-              {profiles.trainer_2.name}
-            </span>
-          </div>
-        </div>
-
-        {/* 14 Day Grid */}
-        <div className="grid grid-cols-7 sm:grid-cols-14 gap-2 pt-2">
-          {daysList14.map((day, idx) => {
-            const hasActivity = day.t1 > 0 || day.t2 > 0;
-            const isToday = idx === daysList14.length - 1;
-
-            return (
-              <div
-                key={day.dateStr}
-                className={`p-2 rounded-2xl border-2 flex flex-col items-center justify-between min-h-[90px] transition ${
-                  isToday
-                    ? "border-indigo-500 bg-indigo-50/50 shadow-xs ring-2 ring-indigo-500/20"
-                    : hasActivity
-                    ? "bg-slate-50 border-slate-200 hover:border-slate-300"
-                    : "bg-white border-slate-100 opacity-60"
-                }`}
-              >
-                <div className="text-center">
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider block">
-                    {day.weekday}
-                  </span>
-                  <span className="text-xs font-black text-slate-800 block leading-tight">
-                    {day.dayNum}
-                  </span>
-                </div>
-
-                {/* Badges for episodes watched */}
-                <div className="w-full space-y-1 my-1">
-                  {day.t1 > 0 && (
-                    <div className="w-full py-0.5 px-1 rounded-md bg-amber-400 text-slate-950 font-black text-[9px] text-center shadow-2xs">
-                      +{day.t1}
-                    </div>
-                  )}
-                  {day.t2 > 0 && (
-                    <div className="w-full py-0.5 px-1 rounded-md bg-orange-500 text-white font-black text-[9px] text-center shadow-2xs">
-                      +{day.t2}
-                    </div>
-                  )}
-                  {!hasActivity && (
-                    <span className="text-[10px] text-slate-300 block text-center">-</span>
-                  )}
-                </div>
-
-                <span className="text-[8px] font-bold text-slate-400">
-                  {isToday ? "Heute" : day.monthStr}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            {/* Trainer 1 detail card */}
+            <div className="p-3.5 bg-white rounded-xl border border-amber-200 shadow-2xs space-y-1.5">
+              <div className="flex items-center gap-2 font-black text-amber-800">
+                <span className="w-3 h-3 rounded-full bg-amber-400 flex-shrink-0" />
+                <span className="text-sm">{profiles.trainer_1.name}</span>
+                <span className="ml-auto px-2 py-0.5 rounded-lg bg-amber-100 text-amber-900 font-black text-xs">
+                  {selectedDayData.t1} {selectedDayData.t1 === 1 ? "Folge" : "Folgen"}
                 </span>
               </div>
-            );
-          })}
+              {selectedDayData.t1Episodes.length > 0 ? (
+                <div className="pt-1 text-slate-600">
+                  <span className="font-semibold text-[11px] text-slate-400 block mb-0.5">
+                    Geschaut:
+                  </span>
+                  <p className="font-bold text-slate-800 leading-relaxed">
+                    Folge #{selectedDayData.t1Episodes.join(", #")}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-slate-400 italic pt-1 text-[11px]">
+                  Keine Folgen an diesem Tag geschaut
+                </p>
+              )}
+            </div>
+
+            {/* Trainer 2 detail card */}
+            <div className="p-3.5 bg-white rounded-xl border border-orange-200 shadow-2xs space-y-1.5">
+              <div className="flex items-center gap-2 font-black text-orange-800">
+                <span className="w-3 h-3 rounded-full bg-orange-500 flex-shrink-0" />
+                <span className="text-sm">{profiles.trainer_2.name}</span>
+                <span className="ml-auto px-2 py-0.5 rounded-lg bg-orange-100 text-orange-900 font-black text-xs">
+                  {selectedDayData.t2} {selectedDayData.t2 === 1 ? "Folge" : "Folgen"}
+                </span>
+              </div>
+              {selectedDayData.t2Episodes.length > 0 ? (
+                <div className="pt-1 text-slate-600">
+                  <span className="font-semibold text-[11px] text-slate-400 block mb-0.5">
+                    Geschaut:
+                  </span>
+                  <p className="font-bold text-slate-800 leading-relaxed">
+                    Folge #{selectedDayData.t2Episodes.join(", #")}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-slate-400 italic pt-1 text-[11px]">
+                  Keine Folgen an diesem Tag geschaut
+                </p>
+              )}
+            </div>
+          </div>
+
+          {selectedDayData.t1 === 0 && selectedDayData.t2 === 0 && (
+            <p className="text-center text-[11px] text-slate-400 font-medium pt-1">
+              Tipp: Klicke auf andere Tage im Kalender (z.B. mit Farbabzeichen), um deren Verlauf zu sehen.
+            </p>
+          )}
         </div>
       </div>
 
