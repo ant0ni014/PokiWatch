@@ -110,16 +110,16 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Supabase Status / Setup Button */}
           <button
             onClick={onOpenSupabaseModal}
-            className={`hidden xs:flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-xl text-xs font-bold transition-all shadow-sm ${
+            className={`flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-xl text-xs font-bold transition-all shadow-sm ${
               isSupabaseConnected
                 ? "bg-emerald-500 text-white border border-emerald-400 hover:bg-emerald-600"
                 : "bg-white/15 text-white border border-white/30 hover:bg-white/25"
             }`}
             title={isSupabaseConnected ? "Supabase Live-Sync aktiv" : "Klicke für Supabase Echtzeit-Sync"}
           >
-            <Database className="w-3 h-3" />
-            <span className="hidden xl:inline text-[11px]">
-              {isSupabaseConnected ? "Live" : "Lokal"}
+            <Database className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="text-[11px]">
+              {isSupabaseConnected ? "Live" : "Cloud"}
             </span>
             <span className={`w-1.5 h-1.5 rounded-full ${isSupabaseConnected ? "bg-white animate-pulse" : "bg-red-300"}`} />
           </button>

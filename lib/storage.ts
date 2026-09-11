@@ -44,56 +44,63 @@ export function saveLocalData(data: PokiWatchData): void {
 }
 
 /**
- * Fetch remote state from Supabase for the currently authenticated user.
+ * Fetch remote state from Supabase from the shared pokiwatch_state table.
  */
 export async function fetchRemoteState(): Promise<{ watchState: WatchStateMap; profiles?: { trainer_1: TrainerProfile; trainer_2: TrainerProfile } } | null> {
   const supabase = getSupabaseClient();
   if (!supabase) return null;
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
+  try {
+    const { data, error } = await supabase
+      .from('pokiwatch_state')
+      .select('watch_state, profiles')
+      .eq('id', 'global_state')
+      .maybeSingle();
 
-  const { data, error } = await supabase
-    .from('pokiwatch_user_state')
-    .select('watch_state, profiles')
-    .eq('user_id', user.id)
-    .single();
+    if (error) {
+      console.warn('Supabase fetch warning:', error.message);
+      return null;
+    }
 
-  if (error) {
-    console.warn('Supabase fetch warning:', error.message);
+    if (!data) return null;
+
+    return {
+      watchState: data.watch_state || {},
+      profiles: data.profiles || undefined
+    };
+  } catch (err) {
+    console.warn('Supabase fetch error:', err);
     return null;
   }
-
-  return {
-    watchState: data?.watch_state || {},
-    profiles: data?.profiles || undefined
-  };
 }
 
 /**
- * Push local state to Supabase for the current user.
+ * Push local state to Supabase in the shared pokiwatch_state table.
  */
 export async function pushRemoteState(watchState: WatchStateMap, profiles?: { trainer_1: TrainerProfile; trainer_2: TrainerProfile }) {
   const supabase = getSupabaseClient();
   if (!supabase) return false;
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return false;
+  try {
+    const payload: any = {
+      id: 'global_state',
+      watch_state: watchState,
+      updated_at: new Date().toISOString()
+    };
+    if (profiles) payload.profiles = profiles;
 
-  const payload: any = {
-    user_id: user.id,
-    watch_state: watchState,
-    updated_at: new Date().toISOString()
-  };
-  if (profiles) payload.profiles = profiles;
+    const { error } = await supabase
+      .from('pokiwatch_state')
+      .upsert(payload, { onConflict: 'id' });
 
-  const { error } = await supabase
-    .from('pokiwatch_user_state')
-    .upsert(payload, { onConflict: 'user_id' });
-
-  if (error) {
-    console.warn('Supabase push error:', error.message);
+    if (error) {
+      console.warn('Supabase push error:', error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.warn('Supabase push error:', err);
     return false;
   }
-  return true;
 }
+
