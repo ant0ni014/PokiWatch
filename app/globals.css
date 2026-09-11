@@ -65,3 +65,12 @@ div::-webkit-scrollbar {
   background-image: radial-gradient(#e2e8f0 1.5px, transparent 1.5px);
   background-size: 24px 24px;
 }
+
+/* Prevent auto-zoom on mobile devices when focusing inputs */
+@media screen and (max-width: 768px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
