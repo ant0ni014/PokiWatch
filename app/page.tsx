@@ -9,7 +9,6 @@ import { EpisodeList } from "@/components/EpisodeList";
 import { EasyModeMobile } from "@/components/EasyModeMobile";
 import { EpisodeDetailModal } from "@/components/EpisodeDetailModal";
 import { ProfileEditModal } from "@/components/ProfileEditModal";
-import { PinLockModal } from "@/components/PinLockModal";
 import { AuthModal } from "@/components/AuthModal";
 import { TrainerSelectModal } from "@/components/TrainerSelectModal";
 import { SupabaseSetupModal } from "@/components/SupabaseSetupModal";
@@ -64,7 +63,6 @@ export default function Home() {
   const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
   const [isPlaylistModalOpen, setIsPlaylistModalOpen] = useState(false);
   const [isPlaylistLinkModalOpen, setIsPlaylistLinkModalOpen] = useState(false);
-  const [pendingTrainerPin, setPendingTrainerPin] = useState<TrainerId | null>(null);
 
   // Filters & Search
   const [filterMode, setFilterMode] = useState<FilterMode>("all");
@@ -304,18 +302,6 @@ export default function Home() {
     showToast("🏆 Alle Folgen geschaut!");
   }, [episodes, watchState, activeTrainerId, showToast]);
 
-  const handleSelectActiveTrainer = useCallback((id: TrainerId) => {
-    const target = profiles[id];
-    if (target?.customPin) {
-      setPendingTrainerPin(id);
-    } else {
-      setActiveTrainerId(id);
-      if (typeof window !== "undefined") {
-        localStorage.setItem("pokiwatch_active_trainer", id);
-      }
-    }
-  }, [profiles]);
-
   const handleSaveProfiles = useCallback(
     (newProfiles: { trainer_1: TrainerProfile; trainer_2: TrainerProfile }) => {
       setProfiles(newProfiles);
@@ -472,7 +458,6 @@ export default function Home() {
         onChangeTab={setActiveTab}
         discoveredCount={sharedPokedex.unlockedCount}
         totalPokemonCount={sharedPokedex.totalUniqueCount}
-        onSelectActiveTrainer={handleSelectActiveTrainer}
         onOpenProfileModal={() => setIsProfileModalOpen(true)}
         onOpenSupabaseModal={() => setIsSupabaseModalOpen(true)}
         onOpenPlaylistModal={() => setIsPlaylistModalOpen(true)}
@@ -488,9 +473,13 @@ export default function Home() {
           const client = getSupabaseClient();
           if (client) {
             await client.auth.signOut();
-            setCurrentUser(null);
-            showToast("👋 Erfolgreich abgemeldet.");
           }
+          setCurrentUser(null);
+          setDeviceTrainerChosen(false);
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("pokiwatch_device_trainer");
+          }
+          showToast("👋 Erfolgreich abgemeldet.");
         }}
       />
 
@@ -637,7 +626,6 @@ export default function Home() {
           profiles={profiles}
           activeTrainerId={activeTrainerId}
           watchState={watchState}
-          onSelectActiveTrainer={handleSelectActiveTrainer}
           onSaveProfiles={handleSaveProfiles}
           onClose={() => setIsProfileModalOpen(false)}
         />
@@ -678,34 +666,6 @@ export default function Home() {
           onLoginSuccess={(user) => {
             setCurrentUser(user);
             showToast(`🎉 Eingeloggt als ${user.email}!`);
-          }}
-        />
-      )}
-
-      {pendingTrainerPin && (
-        <PinLockModal
-          isOpen={Boolean(pendingTrainerPin)}
-          onClose={() => setPendingTrainerPin(null)}
-          targetTrainer={profiles[pendingTrainerPin]}
-          onSuccess={() => {
-            const nextId = pendingTrainerPin;
-            setActiveTrainerId(nextId);
-            if (typeof window !== "undefined") {
-              localStorage.setItem("pokiwatch_active_trainer", nextId);
-            }
-            showToast(`🔓 Als ${profiles[nextId].name} eingeloggt!`);
-            setPendingTrainerPin(null);
-          }}
-          onSetNewPin={(newPin) => {
-            const nextId = pendingTrainerPin;
-            const updated = {
-              ...profiles,
-              [nextId]: {
-                ...profiles[nextId],
-                customPin: newPin
-              }
-            };
-            handleSaveProfiles(updated);
           }}
         />
       )}

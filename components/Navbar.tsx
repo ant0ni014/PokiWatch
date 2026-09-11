@@ -16,7 +16,6 @@ interface NavbarProps {
   onChangeTab: (tab: "episodes" | "pokedex" | "activity") => void;
   discoveredCount?: number;
   totalPokemonCount?: number;
-  onSelectActiveTrainer: (id: TrainerId) => void;
   onOpenProfileModal: () => void;
   onOpenSupabaseModal: () => void;
   onOpenPlaylistModal: () => void;
@@ -38,7 +37,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onChangeTab,
   discoveredCount,
   totalPokemonCount,
-  onSelectActiveTrainer,
   onOpenProfileModal,
   onOpenSupabaseModal,
   onOpenPlaylistModal,
