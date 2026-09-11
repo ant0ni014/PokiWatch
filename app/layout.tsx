@@ -34,6 +34,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de" className={`${outfit.variable} ${inter.variable} h-full antialiased dark`}>
+      <head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
+      </head>
       <body className="min-h-full flex flex-col font-sans bg-[#070a11] text-slate-100">
         {children}
       </body>

@@ -66,11 +66,15 @@ div::-webkit-scrollbar {
   background-size: 24px 24px;
 }
 
-/* Prevent auto-zoom on mobile devices when focusing inputs */
-@media screen and (max-width: 768px) {
-  input,
-  textarea,
-  select {
-    font-size: 16px !important;
-  }
+/* Universal anti-zoom for all mobile devices & browsers */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+input,
+textarea,
+select {
+  font-size: 16px !important;
+  touch-action: manipulation;
 }

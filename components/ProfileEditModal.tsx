@@ -105,6 +105,7 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
                   value={trainer1Name}
                   onChange={(e) => setTrainer1Name(e.target.value)}
                   placeholder="Name z.B. Ash"
+                  style={{ fontSize: "16px" }}
                   className="w-full px-3.5 py-2 rounded-xl bg-white border-2 border-slate-200 text-base text-slate-900 font-bold focus:outline-none focus:border-amber-500"
                 />
               </div>
@@ -120,6 +121,7 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
                   value={trainer1Pin}
                   onChange={(e) => setTrainer1Pin(e.target.value)}
                   placeholder="z. B. 1234 (leer = kein PIN)"
+                  style={{ fontSize: "16px" }}
                   className="w-full px-3.5 py-2 rounded-xl bg-white border-2 border-slate-200 text-base font-bold focus:outline-none focus:border-amber-500"
                 />
               </div>
@@ -157,6 +159,7 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
                   value={trainer2Name}
                   onChange={(e) => setTrainer2Name(e.target.value)}
                   placeholder="Name z.B. Misty"
+                  style={{ fontSize: "16px" }}
                   className="w-full px-3.5 py-2 rounded-xl bg-white border-2 border-slate-200 text-base text-slate-900 font-bold focus:outline-none focus:border-orange-500"
                 />
               </div>
@@ -172,6 +175,7 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
                   value={trainer2Pin}
                   onChange={(e) => setTrainer2Pin(e.target.value)}
                   placeholder="z. B. 5678 (leer = kein PIN)"
+                  style={{ fontSize: "16px" }}
                   className="w-full px-3.5 py-2 rounded-xl bg-white border-2 border-slate-200 text-base font-bold focus:outline-none focus:border-orange-500"
                 />
               </div>
