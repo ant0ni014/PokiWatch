@@ -122,44 +122,44 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className={`w-1.5 h-1.5 rounded-full ${isSupabaseConnected ? "bg-white animate-pulse" : "bg-red-300"}`} />
           </button>
 
-          {/* Active Trainer Pill (Compact on Mobile) */}
-          <div className="flex items-center bg-white p-0.5 sm:p-1 rounded-2xl shadow-md border border-slate-200">
-            
-            {/* Active Trainer */}
-            <button
-              onClick={onOpenProfileModal}
-              className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 font-black text-xs shadow-sm hover:from-amber-300 hover:to-yellow-300 transition"
-              title="Klicke zum Bearbeiten"
-            >
-              <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0 border border-slate-800">
-                {activeProfile.image ? (
-                  <img src={activeProfile.image} alt={activeProfile.name} className="w-full h-full object-cover" />
-                ) : (
-                  <span>{activeProfile.avatar}</span>
-                )}
-              </div>
-              <span className="truncate max-w-[65px] sm:max-w-[100px] text-[11px] sm:text-xs">
-                {activeProfile.name}
-              </span>
-            </button>
+          {/* If Logged In: Show Active Trainer Pill & Switcher */}
+          {currentUser ? (
+            <div className="flex items-center bg-white p-0.5 sm:p-1 rounded-2xl shadow-md border border-slate-200">
+              {/* Active Trainer */}
+              <button
+                onClick={onOpenProfileModal}
+                className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 font-black text-xs shadow-sm hover:from-amber-300 hover:to-yellow-300 transition"
+                title="Klicke zum Bearbeiten"
+              >
+                <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0 border border-slate-800">
+                  {activeProfile.image ? (
+                    <img src={activeProfile.image} alt={activeProfile.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span>{activeProfile.avatar}</span>
+                  )}
+                </div>
+                <span className="truncate max-w-[65px] sm:max-w-[100px] text-[11px] sm:text-xs">
+                  {activeProfile.name}
+                </span>
+              </button>
 
-            {/* Quick Switch to Partner */}
-            <button
-              onClick={() => onSelectActiveTrainer(otherTrainerId)}
-              className="flex items-center gap-1 px-2 py-1 rounded-xl text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition text-xs font-bold"
-              title={`Zu ${otherProfile.name} wechseln`}
-            >
-              <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0 border border-slate-300">
-                {otherProfile.image ? (
-                  <img src={otherProfile.image} alt={otherProfile.name} className="w-full h-full object-cover" />
-                ) : (
-                  <span>{otherProfile.avatar}</span>
-                )}
-              </div>
-              <span className="hidden xs:inline text-[11px]">{otherProfile.name}</span>
-            </button>
-
-          </div>
+              {/* Quick Switch to Partner (with PIN check) */}
+              <button
+                onClick={() => onSelectActiveTrainer(otherTrainerId)}
+                className="flex items-center gap-1 px-2 py-1 rounded-xl text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition text-xs font-bold"
+                title={`Zu ${otherProfile.name} wechseln`}
+              >
+                <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0 border border-slate-300">
+                  {otherProfile.image ? (
+                    <img src={otherProfile.image} alt={otherProfile.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span>{otherProfile.avatar}</span>
+                  )}
+                </div>
+                <span className="hidden xs:inline text-[11px]">{otherProfile.name}</span>
+              </button>
+            </div>
+          ) : null}
 
           {/* Login / Auth Button */}
           {currentUser ? (

@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import confetti from "canvas-confetti";
 import { Navbar } from "@/components/Navbar";
+import { PokeballLogo } from "@/components/PokeballLogo";
 import { ComparisonBar, FilterMode } from "@/components/ComparisonBar";
 import { EpisodeList } from "@/components/EpisodeList";
 import { EasyModeMobile } from "@/components/EasyModeMobile";
@@ -51,6 +52,7 @@ export default function Home() {
   const [isSupabaseConnected, setIsSupabaseConnected] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // Modals
@@ -131,10 +133,14 @@ export default function Home() {
         if (data?.session?.user) {
           setCurrentUser(data.session.user);
         }
+        setIsAuthChecked(true);
+      }).catch(() => {
+        setIsAuthChecked(true);
       });
 
       const { data: authListener } = client.auth.onAuthStateChange((_event, session) => {
         setCurrentUser(session?.user || null);
+        setIsAuthChecked(true);
       });
 
       const channel = client
@@ -354,13 +360,60 @@ export default function Home() {
     setIsSyncing(false);
   }, [showToast]);
 
-  if (!isMounted) {
+  if (!isMounted || !isAuthChecked) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center text-slate-600">
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">
         <div className="flex flex-col items-center gap-3">
           <div className="w-12 h-12 rounded-full border-4 border-red-600 border-t-transparent animate-spin" />
-          <p className="text-sm font-bold text-slate-800">PokiWatch Pokédex lädt...</p>
+          <p className="text-sm font-bold text-slate-200">PokiWatch lädt...</p>
         </div>
+      </div>
+    );
+  }
+
+  // Not logged in to Main Account -> Show Gatekeeper Lock Screen
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-[#070a11] text-white flex flex-col items-center justify-center p-4 selection:bg-red-600 selection:text-white relative overflow-hidden">
+        {/* Background Aura */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] bg-red-600/15 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 w-full max-w-sm flex flex-col items-center text-center space-y-6 animate-in fade-in zoom-in-95 duration-300">
+          <PokeballLogo size="xl" className="hover:rotate-45 transition-transform duration-500" />
+
+          <div className="space-y-2">
+            <h1 className="text-3xl font-black tracking-tight text-white">
+              PokiWatch
+            </h1>
+            <p className="text-xs text-slate-400 font-medium max-w-xs mx-auto">
+              Privater 2-Personen Pokémon Watch-Tracker. Bitte melde dich an, um Zugriff zu erhalten.
+            </p>
+          </div>
+
+          <button
+            onClick={() => setIsAuthModalOpen(true)}
+            className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-sm shadow-xl shadow-red-950/50 transition active:scale-95"
+          >
+            <span>Jetzt Anmelden / Registrieren</span>
+            <span className="text-base">➔</span>
+          </button>
+
+          <p className="text-[11px] text-slate-500 font-semibold">
+            Geschützt für deine 2 Unterkonten (Ash & Misty)
+          </p>
+        </div>
+
+        {/* Modal for logging in */}
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          forceLogin={true}
+          onLoginSuccess={(user) => {
+            setCurrentUser(user);
+            setIsAuthModalOpen(false);
+            showToast(`🎉 Willkommen zurück, ${user.email}!`);
+          }}
+        />
       </div>
     );
   }
