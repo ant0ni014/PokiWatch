@@ -94,7 +94,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              placeholder="z. B. shanan"
+              placeholder="Benutzername eingeben"
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border-2 border-slate-200 text-sm text-slate-900 font-medium focus:outline-none focus:border-red-500"
             />
           </div>
