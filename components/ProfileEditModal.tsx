@@ -81,6 +81,45 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
         {/* Scrollable Body */}
         <div className="p-4 sm:p-5 overflow-y-auto space-y-4 text-xs">
 
+        {/* Switch Device Trainer (Ash <-> Misty) */}
+        <div className="p-3.5 rounded-2xl bg-slate-100 border border-slate-200 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-black uppercase tracking-wider text-slate-600">
+              Aktiver Trainer auf diesem Gerät:
+            </span>
+            <span className="text-[10px] text-slate-400 font-bold">Klicke zum Wechseln</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => onSelectActiveTrainer("trainer_1")}
+              className={`flex items-center gap-2 p-2 rounded-xl border-2 font-black text-xs transition ${
+                activeTrainerId === "trainer_1"
+                  ? "bg-amber-100 border-amber-500 text-amber-950 shadow-sm"
+                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              <span className="text-base">{trainer1Avatar}</span>
+              <span className="truncate">{trainer1Name}</span>
+              {activeTrainerId === "trainer_1" && <Check className="w-3.5 h-3.5 ml-auto text-amber-700 flex-shrink-0" />}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onSelectActiveTrainer("trainer_2")}
+              className={`flex items-center gap-2 p-2 rounded-xl border-2 font-black text-xs transition ${
+                activeTrainerId === "trainer_2"
+                  ? "bg-orange-100 border-orange-500 text-orange-950 shadow-sm"
+                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              <span className="text-base">{trainer2Avatar}</span>
+              <span className="truncate">{trainer2Name}</span>
+              {activeTrainerId === "trainer_2" && <Check className="w-3.5 h-3.5 ml-auto text-orange-700 flex-shrink-0" />}
+            </button>
+          </div>
+        </div>
+
         {/* Active Trainer's Profile Edit Form */}
         <div className="space-y-3 p-4 rounded-2xl bg-slate-50 border-2 border-slate-200">
           <div className="flex items-center gap-2">
@@ -90,7 +129,7 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
               {activeTrainerId === "trainer_1" ? "Trainer 1" : "Trainer 2"}
             </span>
             <span className="text-xs font-black text-slate-800">
-              Dein Profil auf diesem Gerät ({activeTrainerId === "trainer_1" ? trainer1Name : trainer2Name})
+              Profil bearbeiten ({activeTrainerId === "trainer_1" ? trainer1Name : trainer2Name})
             </span>
           </div>
 
