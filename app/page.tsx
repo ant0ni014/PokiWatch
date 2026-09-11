@@ -16,7 +16,6 @@ import { PlaylistSyncModal } from "@/components/PlaylistSyncModal";
 import { PlaylistLinkModal } from "@/components/PlaylistLinkModal";
 import { PokedexView } from "@/components/PokedexView";
 import { ActivityView } from "@/components/ActivityView";
-import { CardsView } from "@/components/CardsView";
 import { getAllEpisodes } from "@/lib/data/episodes";
 import { calculateSharedPokedex } from "@/lib/data/pokedex";
 import { getSavedPlaylistId, DEFAULT_PLAYLIST_ID } from "@/lib/playlist";
@@ -25,11 +24,10 @@ import {
   saveLocalData,
   fetchRemoteState,
   pushRemoteState,
-  DEFAULT_PROFILES,
-  DEFAULT_CARDS_STATE
+  DEFAULT_PROFILES
 } from "@/lib/storage";
 import { getSupabaseClient } from "@/lib/supabaseClient";
-import { Episode, TrainerId, TrainerProfile, WatchStateMap, CardsState } from "@/types";
+import { Episode, TrainerId, TrainerProfile, WatchStateMap } from "@/types";
 import { Zap, Smartphone } from "lucide-react";
 
 export default function Home() {
@@ -41,10 +39,9 @@ export default function Home() {
   const [activeTrainerId, setActiveTrainerId] = useState<TrainerId>("trainer_1");
   const [deviceTrainerChosen, setDeviceTrainerChosen] = useState(false);
   const [watchState, setWatchState] = useState<WatchStateMap>({});
-  const [cardsState, setCardsState] = useState<CardsState>(DEFAULT_CARDS_STATE);
 
-  // Active Category Tab: 'episodes' | 'pokedex' | 'cards' | 'activity'
-  const [activeTab, setActiveTab] = useState<"episodes" | "pokedex" | "cards" | "activity">("episodes");
+  // Active Category Tab: 'episodes' | 'pokedex' | 'activity'
+  const [activeTab, setActiveTab] = useState<"episodes" | "pokedex" | "activity">("episodes");
 
   // View mode & Easy Mode
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
@@ -86,9 +83,6 @@ export default function Home() {
     const initial = getInitialData();
     setProfiles(initial.profiles || DEFAULT_PROFILES);
     setWatchState(initial.watchState || {});
-    if (initial.cardsState) {
-      setCardsState(initial.cardsState);
-    }
 
     // Check if user has explicitly chosen a trainer for this device
     const savedTrainer = localStorage.getItem("pokiwatch_device_trainer") as TrainerId | null;
@@ -132,7 +126,6 @@ export default function Home() {
                 profiles: remote.profiles || initial.profiles,
                 activeTrainerId: initial.activeTrainerId,
                 watchState: merged,
-                cardsState: remote.cardsState || initial.cardsState,
                 lastUpdated: new Date().toISOString()
               });
               return merged;
@@ -140,9 +133,6 @@ export default function Home() {
           }
           if (remote.profiles) {
             setProfiles(remote.profiles);
-          }
-          if (remote.cardsState) {
-            setCardsState(remote.cardsState);
           }
         }
         setIsSyncing(false);
@@ -215,32 +205,14 @@ export default function Home() {
         profiles,
         activeTrainerId,
         watchState: newState,
-        cardsState,
         lastUpdated: new Date().toISOString()
       });
 
       if (isSupabaseConnected) {
-        pushRemoteState(newState, profiles, cardsState);
+        pushRemoteState(newState, profiles);
       }
     },
-    [profiles, activeTrainerId, cardsState, isSupabaseConnected]
-  );
-
-  const handleUpdateCardsState = useCallback(
-    (newCardsState: CardsState) => {
-      setCardsState(newCardsState);
-      saveLocalData({
-        profiles,
-        activeTrainerId,
-        watchState,
-        cardsState: newCardsState,
-        lastUpdated: new Date().toISOString()
-      });
-      if (isSupabaseConnected) {
-        pushRemoteState(watchState, profiles, newCardsState);
-      }
-    },
-    [profiles, activeTrainerId, watchState, isSupabaseConnected]
+    [profiles, activeTrainerId, isSupabaseConnected]
   );
 
   const handleToggleWatch = useCallback(
@@ -378,17 +350,6 @@ export default function Home() {
     [episodes, watchState]
   );
 
-  // Available booster packs calculation
-  const availablePacksCount = useMemo(() => {
-    let watched = 0;
-    Object.values(watchState).forEach((rec) => {
-      if (activeTrainerId === "trainer_1" && rec.trainer_1) watched++;
-      if (activeTrainerId === "trainer_2" && rec.trainer_2) watched++;
-    });
-    const opened = cardsState.openedPacksCount?.[activeTrainerId] || 0;
-    return Math.max(0, watched - opened);
-  }, [watchState, activeTrainerId, cardsState.openedPacksCount]);
-
   const handleForceSync = useCallback(async () => {
     setIsSyncing(true);
     const remote = await fetchRemoteState();
@@ -497,7 +458,6 @@ export default function Home() {
         onChangeTab={setActiveTab}
         discoveredCount={sharedPokedex.unlockedCount}
         totalPokemonCount={sharedPokedex.totalUniqueCount}
-        availablePacksCount={availablePacksCount}
         onOpenProfileModal={() => setIsProfileModalOpen(true)}
         onOpenSupabaseModal={() => setIsSupabaseModalOpen(true)}
         onOpenPlaylistModal={() => setIsPlaylistModalOpen(true)}
@@ -558,18 +518,6 @@ export default function Home() {
             profiles={profiles}
             onSelectEpisode={(ep) => setSelectedEpisode(ep)}
             onSwitchToEpisodesTab={() => setActiveTab("episodes")}
-          />
-        ) : activeTab === "cards" ? (
-          /* TCG Booster Packs & Sammelalbum Tab */
-          <CardsView
-            cardsState={cardsState}
-            onUpdateCardsState={handleUpdateCardsState}
-            activeTrainerId={activeTrainerId}
-            profiles={profiles}
-            unlockedPokemon={sharedPokedex.pokemonList}
-            watchState={watchState}
-            episodes={episodes}
-            onShowToast={showToast}
           />
         ) : activeTab === "activity" ? (
           /* Gemeinsame Watch-Aktivität Tab */

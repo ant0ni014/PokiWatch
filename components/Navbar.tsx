@@ -12,11 +12,10 @@ interface NavbarProps {
     trainer_2: TrainerProfile;
   };
   activeTrainerId: TrainerId;
-  activeTab: "episodes" | "pokedex" | "cards" | "activity";
-  onChangeTab: (tab: "episodes" | "pokedex" | "cards" | "activity") => void;
+  activeTab: "episodes" | "pokedex" | "activity";
+  onChangeTab: (tab: "episodes" | "pokedex" | "activity") => void;
   discoveredCount?: number;
   totalPokemonCount?: number;
-  availablePacksCount?: number;
   onOpenProfileModal: () => void;
   onOpenSupabaseModal: () => void;
   onOpenPlaylistModal: () => void;
@@ -38,7 +37,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onChangeTab,
   discoveredCount,
   totalPokemonCount,
-  availablePacksCount,
   onOpenProfileModal,
   onOpenSupabaseModal,
   onOpenPlaylistModal,
@@ -96,17 +94,17 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Right side: Active Trainer & Logout */}
         <div className="flex items-center gap-1.5 sm:gap-2.5">
 
-          {/* Supabase Status / Setup Button (Hidden for clean look, accessible via profile or settings) */}
+          {/* Supabase Status / Setup Button */}
           <button
             onClick={onOpenSupabaseModal}
-            className="hidden"
-            title={isSupabaseConnected ? "Supabase Live-Sync aktiv" : "Klicke für Supabase Echtzeit-Sync"}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-red-800/80 hover:bg-red-800 text-white text-xs font-bold border border-red-500/50 shadow-sm transition"
+            title={isSupabaseConnected ? "Supabase Live-Sync verbunden (Klicke für Einstellungen)" : "Supabase nicht verbunden (Klicke zum Verbinden)"}
           >
-            <Database className="w-3.5 h-3.5 flex-shrink-0" />
-            <span className="text-[11px]">
-              {isSupabaseConnected ? "Live" : "Cloud"}
+            <Database className={`w-3.5 h-3.5 flex-shrink-0 ${isSyncing ? "animate-spin text-amber-300" : ""}`} />
+            <span className="text-[11px] hidden xs:inline">
+              {isSupabaseConnected ? "Cloud" : "Lokal"}
             </span>
-            <span className={`w-1.5 h-1.5 rounded-full ${isSupabaseConnected ? "bg-white animate-pulse" : "bg-red-300"}`} />
+            <span className={`w-2 h-2 rounded-full ${isSupabaseConnected ? "bg-emerald-400 shadow-sm shadow-emerald-400 animate-pulse" : "bg-amber-400"}`} />
           </button>
 
           {/* If Logged In: Show Active Trainer on this Device */}
@@ -196,28 +194,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 {discoveredCount}
                 {totalPokemonCount ? ` / ${totalPokemonCount}` : ""}
-              </span>
-            )}
-          </button>
-
-          <button
-            onClick={() => onChangeTab("cards")}
-            className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition-all flex-shrink-0 ${
-              activeTab === "cards"
-                ? "bg-amber-400 text-slate-950 shadow-md scale-100"
-                : "text-white/90 hover:bg-white/10 hover:text-white"
-            }`}
-          >
-            <span>🎴 Karten & Packs</span>
-            {typeof availablePacksCount === "number" && availablePacksCount > 0 && (
-              <span
-                className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${
-                  activeTab === "cards"
-                    ? "bg-red-600 text-white animate-pulse"
-                    : "bg-amber-400 text-slate-950"
-                }`}
-              >
-                {availablePacksCount}
               </span>
             )}
           </button>
