@@ -177,12 +177,15 @@ export default function Home() {
         )
         .subscribe();
 
-      return () => {
-        authListener?.subscription?.unsubscribe();
-        client.removeChannel(channel);
-      };
-    }
-  }, [showToast]);
+        return () => {
+          authListener?.subscription?.unsubscribe();
+          client.removeChannel(channel);
+        };
+      } else {
+        // No Supabase client configured yet
+        setIsAuthChecked(true);
+      }
+    }, [showToast]);
 
   const handleToggleEasyMode = useCallback(() => {
     setIsEasyMode((prev) => {
@@ -412,10 +415,28 @@ export default function Home() {
             <span className="text-base">➔</span>
           </button>
 
+          {!isSupabaseConnected && (
+            <button
+              onClick={() => setIsSupabaseModalOpen(true)}
+              className="w-full py-2 px-4 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-bold transition flex items-center justify-center gap-1.5"
+            >
+              <span>⚙️ Supabase einrichten / verbinden</span>
+            </button>
+          )}
+
           <p className="text-[11px] text-slate-400 font-semibold">
             Zugang nur für autorisierte Trainer
           </p>
         </div>
+
+        {/* Modal for Supabase Setup */}
+        <SupabaseSetupModal
+          isOpen={isSupabaseModalOpen}
+          onClose={() => setIsSupabaseModalOpen(false)}
+          onSaveCredentials={handleSaveSupabaseCredentials}
+          onClearCredentials={handleClearSupabaseCredentials}
+          isConnected={isSupabaseConnected}
+        />
 
         {/* Modal for logging in */}
         <AuthModal
