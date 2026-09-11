@@ -33,34 +33,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
     }
 
     try {
-      if (isRegister) {
-        const { data, error: signUpError } = await client.auth.signUp({
-          email: email.trim(),
-          password: password.trim()
-        });
+      const { data, error: signInError } = await client.auth.signInWithPassword({
+        email: email.trim(),
+        password: password.trim()
+      });
 
-        if (signUpError) {
-          setError(signUpError.message);
-        } else if (data?.user) {
-          if (data.session) {
-            onLoginSuccess(data.user);
-            onClose();
-          } else {
-            setNotice('Registriert! Bitte prüfe dein E-Mail-Postfach zur Bestätigung (oder deaktiviere Confirm Email in Supabase).');
-          }
-        }
-      } else {
-        const { data, error: signInError } = await client.auth.signInWithPassword({
-          email: email.trim(),
-          password: password.trim()
-        });
-
-        if (signInError) {
-          setError(signInError.message);
-        } else if (data?.user) {
-          onLoginSuccess(data.user);
-          onClose();
-        }
+      if (signInError) {
+        setError('Ungültige E-Mail oder falsches Passwort.');
+      } else if (data?.user) {
+        onLoginSuccess(data.user);
+        onClose();
       }
     } catch (err: any) {
       setError(err?.message || 'Unerwarteter Fehler beim Login.');
@@ -135,25 +117,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
             </div>
           )}
 
-          {notice && (
-            <div className="p-3 rounded-xl bg-emerald-50 border-2 border-emerald-200 text-emerald-800 text-xs font-bold">
-              {notice}
-            </div>
-          )}
-
-          <div className="pt-2 space-y-3">
+          <div className="pt-2">
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-sm shadow-md transition disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-sm shadow-md transition disabled:opacity-50"
             >
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
-              ) : isRegister ? (
-                <>
-                  <UserPlus className="w-4 h-4" />
-                  <span>Konto jetzt registrieren</span>
-                </>
               ) : (
                 <>
                   <LogIn className="w-4 h-4" />
@@ -161,22 +132,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                 </>
               )}
             </button>
-
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsRegister(!isRegister);
-                  setError('');
-                  setNotice('');
-                }}
-                className="text-xs text-red-600 hover:underline font-black"
-              >
-                {isRegister
-                  ? 'Bereits registriert? Hier zum Login'
-                  : 'Noch kein Konto? Jetzt registrieren'}
-              </button>
-            </div>
           </div>
         </form>
 
