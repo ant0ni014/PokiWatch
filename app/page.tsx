@@ -11,6 +11,7 @@ import { EpisodeDetailModal } from "@/components/EpisodeDetailModal";
 import { ProfileEditModal } from "@/components/ProfileEditModal";
 import { PinLockModal } from "@/components/PinLockModal";
 import { AuthModal } from "@/components/AuthModal";
+import { TrainerSelectModal } from "@/components/TrainerSelectModal";
 import { SupabaseSetupModal } from "@/components/SupabaseSetupModal";
 import { PlaylistSyncModal } from "@/components/PlaylistSyncModal";
 import { PlaylistLinkModal } from "@/components/PlaylistLinkModal";
@@ -36,6 +37,7 @@ export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
   const [profiles, setProfiles] = useState<{ trainer_1: TrainerProfile; trainer_2: TrainerProfile }>(DEFAULT_PROFILES);
   const [activeTrainerId, setActiveTrainerId] = useState<TrainerId>("trainer_1");
+  const [deviceTrainerChosen, setDeviceTrainerChosen] = useState(false);
   const [watchState, setWatchState] = useState<WatchStateMap>({});
 
   // Active Category Tab: 'episodes' | 'pokedex'
@@ -81,8 +83,17 @@ export default function Home() {
   useEffect(() => {
     const initial = getInitialData();
     setProfiles(initial.profiles || DEFAULT_PROFILES);
-    setActiveTrainerId(initial.activeTrainerId || "trainer_1");
     setWatchState(initial.watchState || {});
+
+    // Check if user has explicitly chosen a trainer for this device
+    const savedTrainer = localStorage.getItem("pokiwatch_device_trainer") as TrainerId | null;
+    if (savedTrainer === "trainer_1" || savedTrainer === "trainer_2") {
+      setActiveTrainerId(savedTrainer);
+      setDeviceTrainerChosen(true);
+    } else {
+      setActiveTrainerId(initial.activeTrainerId || "trainer_1");
+      setDeviceTrainerChosen(false);
+    }
 
     // Saved Easy Mode
     const savedEasy = localStorage.getItem("pokiwatch_easy_mode");
@@ -668,6 +679,33 @@ export default function Home() {
               }
             };
             handleSaveProfiles(updated);
+          }}
+        />
+      )}
+
+      {/* Trainer Choice Popup for this device (Ash or Misty) */}
+      {currentUser && !deviceTrainerChosen && (
+        <TrainerSelectModal
+          isOpen={!deviceTrainerChosen}
+          profiles={profiles}
+          onSelectTrainer={(chosenId) => {
+            setActiveTrainerId(chosenId);
+            setDeviceTrainerChosen(true);
+            if (typeof window !== "undefined") {
+              localStorage.setItem("pokiwatch_device_trainer", chosenId);
+              localStorage.setItem("pokiwatch_active_trainer", chosenId);
+            }
+            showToast(`⭐ Dieses Gerät ist jetzt ${profiles[chosenId].name}!`);
+          }}
+          onLogout={async () => {
+            const client = getSupabaseClient();
+            if (client) {
+              await client.auth.signOut();
+              setCurrentUser(null);
+              setDeviceTrainerChosen(false);
+              localStorage.removeItem("pokiwatch_device_trainer");
+              showToast("👋 Erfolgreich abgemeldet.");
+            }
           }}
         />
       )}

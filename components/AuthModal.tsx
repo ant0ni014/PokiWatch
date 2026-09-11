@@ -32,14 +32,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
       return;
     }
 
+    // Allow user to enter 'shanan' or 'shanan@pokiwatch.local'
+    const trimmedInput = email.trim();
+    const formattedEmail = trimmedInput.includes('@') ? trimmedInput : `${trimmedInput.toLowerCase()}@pokiwatch.local`;
+
     try {
       const { data, error: signInError } = await client.auth.signInWithPassword({
-        email: email.trim(),
+        email: formattedEmail,
         password: password.trim()
       });
 
       if (signInError) {
-        setError('Ungültige E-Mail oder falsches Passwort.');
+        setError('Ungültiger Benutzername oder falsches Passwort.');
       } else if (data?.user) {
         onLoginSuccess(data.user);
         onClose();
@@ -83,14 +87,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
         <form onSubmit={handleSubmit} className="space-y-3.5 pt-1">
           <div>
             <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1">
-              E-Mail Adresse
+              Benutzername
             </label>
             <input
-              type="email"
+              type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              placeholder="trainer@pokemon.de"
+              placeholder="z. B. shanan"
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border-2 border-slate-200 text-sm text-slate-900 font-medium focus:outline-none focus:border-red-500"
             />
           </div>
