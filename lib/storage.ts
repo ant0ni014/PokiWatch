@@ -31,23 +31,48 @@ export const DEFAULT_CARDS_STATE: CardsState = {
 };
 
 /**
- * Return initial empty data – actual state is loaded from Supabase after login.
+ * Return initial data from localStorage if present (for instant UI & fallback).
  */
 export function getInitialData(): PokiWatchData & { cardsState?: CardsState } {
+  let watchState: WatchStateMap = {};
+  let profiles = DEFAULT_PROFILES;
+  let activeTrainerId: TrainerId = "trainer_1";
   let cardsState = DEFAULT_CARDS_STATE;
-  if (typeof window !== 'undefined') {
+
+  if (typeof window !== "undefined") {
     try {
-      const savedCards = localStorage.getItem('pokiwatch_cards');
+      // 1. Read legacy pokiwatch_data_v1 or pokiwatch_data
+      const raw = localStorage.getItem("pokiwatch_data") || localStorage.getItem("pokiwatch_data_v1");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed.watchState && Object.keys(parsed.watchState).length > 0) {
+          watchState = parsed.watchState;
+        }
+        if (parsed.profiles) {
+          profiles = parsed.profiles;
+        }
+        if (parsed.activeTrainerId) {
+          activeTrainerId = parsed.activeTrainerId;
+        }
+        if (parsed.cardsState) {
+          cardsState = parsed.cardsState;
+        }
+      }
+
+      // 2. Read cards if stored separately
+      const savedCards = localStorage.getItem("pokiwatch_cards");
       if (savedCards) {
         cardsState = JSON.parse(savedCards);
       }
-    } catch {}
+    } catch (e) {
+      console.warn("Fehler beim Lesen von localStorage:", e);
+    }
   }
 
   return {
-    profiles: DEFAULT_PROFILES,
-    activeTrainerId: 'trainer_1',
-    watchState: {},
+    profiles,
+    activeTrainerId,
+    watchState,
     cardsState,
     lastUpdated: new Date().toISOString()
   };
@@ -81,6 +106,7 @@ export async function fetchRemoteState(): Promise<{
   if (!supabase) return null;
 
   try {
+    // Attempt to select watch_state, profiles, and cards_state
     const { data, error } = await supabase
       .from('pokiwatch_state')
       .select('watch_state, profiles, cards_state')
@@ -88,7 +114,21 @@ export async function fetchRemoteState(): Promise<{
       .maybeSingle();
 
     if (error) {
-      console.warn('Supabase fetch warning:', error.message);
+      // If error is due to missing 'cards_state' column, fall back to selecting without it
+      console.warn('Supabase fetch with cards_state warning:', error.message);
+      const fallback = await supabase
+        .from('pokiwatch_state')
+        .select('watch_state, profiles')
+        .eq('id', 'global_state')
+        .maybeSingle();
+
+      if (fallback.data) {
+        return {
+          watchState: fallback.data.watch_state || {},
+          profiles: fallback.data.profiles || undefined,
+          cardsState: DEFAULT_CARDS_STATE
+        };
+      }
       return null;
     }
 
@@ -125,9 +165,19 @@ export async function pushRemoteState(
     if (profiles) payload.profiles = profiles;
     if (cardsState) payload.cards_state = cardsState;
 
-    const { error } = await supabase
+    let { error } = await supabase
       .from('pokiwatch_state')
       .upsert(payload, { onConflict: 'id' });
+
+    if (error && payload.cards_state) {
+      // If table doesn't have cards_state column yet, retry pushing watch_state & profiles safely!
+      console.warn('Supabase push with cards_state failed, retrying without cards_state column:', error.message);
+      delete payload.cards_state;
+      const retry = await supabase
+        .from('pokiwatch_state')
+        .upsert(payload, { onConflict: 'id' });
+      error = retry.error;
+    }
 
     if (error) {
       console.warn('Supabase push error:', error.message);
