@@ -171,7 +171,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Category Tab Bar (Episoden vs. Gemeinsamer Pokédex vs. Aktivität) */}
       <div className="bg-red-900/60 backdrop-blur-md border-t border-red-500/30 px-3 sm:px-6 lg:px-8 py-1.5 shadow-inner">
-        <div className="max-w-7xl mx-auto flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none py-0.5">
+        <div className="max-w-7xl mx-auto flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-0.5">
           
           <button
             onClick={() => onChangeTab("episodes")}

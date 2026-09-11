@@ -494,8 +494,8 @@ export default function Home() {
         }}
       />
 
-      {/* Scrollable Main Area (starts strictly BELOW the red Navbar so scrollbar never touches the red header) */}
-      <div className="flex-1 overflow-y-auto min-h-0 flex flex-col">
+      {/* Scrollable Main Area (starts strictly BELOW the red Navbar with hidden scrollbars) */}
+      <div className="flex-1 overflow-y-auto min-h-0 flex flex-col scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
         
         {/* Unlinked Playlist Alert Banner */}
