@@ -9,6 +9,7 @@ import { EasyModeMobile } from "@/components/EasyModeMobile";
 import { EpisodeDetailModal } from "@/components/EpisodeDetailModal";
 import { ProfileEditModal } from "@/components/ProfileEditModal";
 import { PinLockModal } from "@/components/PinLockModal";
+import { AuthModal } from "@/components/AuthModal";
 import { SupabaseSetupModal } from "@/components/SupabaseSetupModal";
 import { PlaylistSyncModal } from "@/components/PlaylistSyncModal";
 import { PlaylistLinkModal } from "@/components/PlaylistLinkModal";
@@ -49,6 +50,8 @@ export default function Home() {
   // Sync & Supabase state
   const [isSupabaseConnected, setIsSupabaseConnected] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // Modals
   const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null);
@@ -123,6 +126,17 @@ export default function Home() {
         setIsSyncing(false);
       });
 
+      // Check current auth session
+      client.auth.getSession().then(({ data }) => {
+        if (data?.session?.user) {
+          setCurrentUser(data.session.user);
+        }
+      });
+
+      const { data: authListener } = client.auth.onAuthStateChange((_event, session) => {
+        setCurrentUser(session?.user || null);
+      });
+
       const channel = client
         .channel("pokiwatch_live_sync")
         .on(
@@ -146,6 +160,7 @@ export default function Home() {
         .subscribe();
 
       return () => {
+        authListener?.subscription?.unsubscribe();
         client.removeChannel(channel);
       };
     }
@@ -379,8 +394,16 @@ export default function Home() {
         onForceSync={handleForceSync}
         viewMode={viewMode}
         onToggleViewMode={handleToggleViewMode}
-        isEasyMode={isEasyMode}
-        onToggleEasyMode={handleToggleEasyMode}
+        currentUser={currentUser}
+        onOpenAuthModal={() => setIsAuthModalOpen(true)}
+        onLogout={async () => {
+          const client = getSupabaseClient();
+          if (client) {
+            await client.auth.signOut();
+            setCurrentUser(null);
+            showToast("👋 Erfolgreich abgemeldet.");
+          }
+        }}
       />
 
       {/* Main Content Area */}
@@ -551,6 +574,17 @@ export default function Home() {
           onSaved={(newId) => {
             setPlaylistId(newId);
             showToast("✅ YouTube-Playlist erfolgreich hinterlegt!");
+          }}
+        />
+      )}
+
+      {isAuthModalOpen && (
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          onLoginSuccess={(user) => {
+            setCurrentUser(user);
+            showToast(`🎉 Eingeloggt als ${user.email}!`);
           }}
         />
       )}

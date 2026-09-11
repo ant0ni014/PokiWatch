@@ -4,7 +4,7 @@ import React from "react";
 import { TrainerProfile, TrainerId } from "@/types";
 import { PokeballLogo } from "./PokeballLogo";
 import { PokedexIcon } from "./PokedexIcon";
-import { Database, UserCheck, RefreshCw } from "lucide-react";
+import { Database, UserCheck, RefreshCw, LogIn, LogOut, ShieldCheck } from "lucide-react";
 
 interface NavbarProps {
   profiles: {
@@ -26,8 +26,9 @@ interface NavbarProps {
   onForceSync: () => void;
   viewMode?: "grid" | "list";
   onToggleViewMode?: (mode: "grid" | "list") => void;
-  isEasyMode?: boolean;
-  onToggleEasyMode?: () => void;
+  currentUser?: any;
+  onOpenAuthModal: () => void;
+  onLogout: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -47,8 +48,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   onForceSync,
   viewMode,
   onToggleViewMode,
-  isEasyMode,
-  onToggleEasyMode
+  currentUser,
+  onOpenAuthModal,
+  onLogout
 }) => {
   const activeProfile = profiles[activeTrainerId];
   const otherTrainerId: TrainerId = activeTrainerId === "trainer_1" ? "trainer_2" : "trainer_1";
@@ -158,6 +160,27 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
           </div>
+
+          {/* Login / Auth Button */}
+          {currentUser ? (
+            <button
+              onClick={onLogout}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-red-700/80 hover:bg-red-800 text-white text-xs font-bold border border-red-500/50 shadow-sm transition"
+              title={`Eingeloggt als ${currentUser.email} (Klicke zum Abmelden)`}
+            >
+              <LogOut className="w-3.5 h-3.5 text-white flex-shrink-0" />
+              <span className="hidden md:inline text-[11px] max-w-[80px] truncate">{currentUser.email?.split('@')[0]}</span>
+            </button>
+          ) : (
+            <button
+              onClick={onOpenAuthModal}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 text-xs font-black shadow-md border border-amber-300 transition active:scale-95"
+              title="Einloggen oder registrieren"
+            >
+              <LogIn className="w-3.5 h-3.5 flex-shrink-0" />
+              <span>Login</span>
+            </button>
+          )}
 
         </div>
 

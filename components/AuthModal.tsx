@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { X, Loader2, Check } from 'lucide-react';
+import { X, Loader2, LogIn, UserPlus, AlertCircle, ShieldCheck } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLoginSuccess: (user: any) => void; // receives supabase user object
+  onLoginSuccess: (user: any) => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess }) => {
@@ -14,6 +14,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
 
   if (!isOpen) return null;
 
@@ -21,68 +22,163 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
     e.preventDefault();
     setLoading(true);
     setError('');
+    setNotice('');
+
     const client = getSupabaseClient();
     if (!client) {
-      setError('Supabase client not available');
+      setError('Keine Verbindung zu Supabase verfügbar.');
       setLoading(false);
       return;
     }
+
     try {
-      let result;
       if (isRegister) {
-        result = await client.auth.signUp({ email, password });
+        const { data, error: signUpError } = await client.auth.signUp({
+          email: email.trim(),
+          password: password.trim()
+        });
+
+        if (signUpError) {
+          setError(signUpError.message);
+        } else if (data?.user) {
+          if (data.session) {
+            onLoginSuccess(data.user);
+            onClose();
+          } else {
+            setNotice('Registriert! Bitte prüfe dein E-Mail-Postfach zur Bestätigung (oder deaktiviere Confirm Email in Supabase).');
+          }
+        }
       } else {
-        result = await client.auth.signInWithPassword({ email, password });
-      }
-      if (result.error) {
-        setError(result.error.message);
-      } else if (result.data?.user) {
-        onLoginSuccess(result.data.user);
-        onClose();
+        const { data, error: signInError } = await client.auth.signInWithPassword({
+          email: email.trim(),
+          password: password.trim()
+        });
+
+        if (signInError) {
+          setError(signInError.message);
+        } else if (data?.user) {
+          onLoginSuccess(data.user);
+          onClose();
+        }
       }
     } catch (err: any) {
-      setError(err?.message || 'Unexpected error');
+      setError(err?.message || 'Unerwarteter Fehler beim Login.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md rounded-3xl bg-white border-2 border-slate-200 shadow-2xl p-6 sm:p-7 text-slate-900 space-y-4">
-        <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-          <h2 className="text-lg font-bold">{isRegister ? 'Registrieren' : 'Login'}</h2>
-          <button onClick={onClose} className="p-1.5 rounded-xl bg-slate-100 text-slate-500 hover:text-slate-800 transition">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="relative w-full max-w-sm rounded-3xl bg-white border-2 border-slate-200 shadow-2xl p-6 text-slate-900 space-y-4">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-red-600 text-white flex items-center justify-center font-bold shadow-sm">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+            <div>
+              <h2 className="text-base font-black text-slate-900">
+                {isRegister ? 'Neues Konto anlegen' : 'PokiWatch Login'}
+              </h2>
+              <p className="text-[11px] text-slate-500 font-bold">
+                {isRegister ? 'Erstelle deinen Trainer-Account' : 'Zugang nur für autorisierte Trainer'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-xl bg-slate-100 text-slate-500 hover:text-slate-800 transition"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-3">
+
+        <form onSubmit={handleSubmit} className="space-y-3.5 pt-1">
           <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1">E‑Mail</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border-2 border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-emerald-500" />
+            <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1">
+              E-Mail Adresse
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="trainer@pokemon.de"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border-2 border-slate-200 text-sm text-slate-900 font-medium focus:outline-none focus:border-red-500"
+            />
           </div>
+
           <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1">Passwort</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border-2 border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-emerald-500" />
+            <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1">
+              Passwort
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              placeholder="Mindestens 6 Zeichen"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border-2 border-slate-200 text-sm text-slate-900 font-medium focus:outline-none focus:border-red-500"
+            />
           </div>
+
           {error && (
-            <div className="p-3 rounded-xl bg-rose-100 border border-rose-300 text-rose-900 text-xs font-bold flex items-center gap-2">
-              <Check className="w-4 h-4 text-rose-600" /> {error}
+            <div className="p-3 rounded-xl bg-rose-50 border-2 border-rose-200 text-rose-800 text-xs font-bold flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
+              <span>{error}</span>
             </div>
           )}
-          <div className="flex items-center justify-between pt-2">
-            <button type="button" onClick={() => setIsRegister(!isRegister)} className="text-xs text-emerald-600 hover:underline">
-              {isRegister ? 'Bereits ein Konto? Login' : 'Neues Konto erstellen'}
+
+          {notice && (
+            <div className="p-3 rounded-xl bg-emerald-50 border-2 border-emerald-200 text-emerald-800 text-xs font-bold">
+              {notice}
+            </div>
+          )}
+
+          <div className="pt-2 space-y-3">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-sm shadow-md transition disabled:opacity-50"
+            >
+              {loading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : isRegister ? (
+                <>
+                  <UserPlus className="w-4 h-4" />
+                  <span>Konto jetzt registrieren</span>
+                </>
+              ) : (
+                <>
+                  <LogIn className="w-4 h-4" />
+                  <span>Einloggen</span>
+                </>
+              )}
             </button>
-            <button type="submit" disabled={loading}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold disabled:opacity-50">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (isRegister ? 'Registrieren' : 'Login')}
-            </button>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsRegister(!isRegister);
+                  setError('');
+                  setNotice('');
+                }}
+                className="text-xs text-red-600 hover:underline font-black"
+              >
+                {isRegister
+                  ? 'Bereits registriert? Hier zum Login'
+                  : 'Noch kein Konto? Jetzt registrieren'}
+              </button>
+            </div>
           </div>
         </form>
+
       </div>
     </div>
   );
 };
+

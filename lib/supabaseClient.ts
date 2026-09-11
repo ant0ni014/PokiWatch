@@ -41,7 +41,7 @@ export function getSupabaseClient(): SupabaseClient | null {
 
   try {
     cachedClient = createClient(creds.url, creds.anonKey, {
-      auth: { persistSession: false },
+      auth: { persistSession: true },
       realtime: { params: { eventsPerSecond: 10 } }
     });
     currentKey = keySignature;
