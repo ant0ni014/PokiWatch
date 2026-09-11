@@ -80,17 +80,22 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
     return { trainer1Count: t1, trainer2Count: t2, sharedCount: shared, recentDays: recentDaysFormatted };
   }, [watchState]);
 
+  const [trainer1Pin, setTrainer1Pin] = useState(profiles.trainer_1.customPin || "");
+  const [trainer2Pin, setTrainer2Pin] = useState(profiles.trainer_2.customPin || "");
+
   const handleSave = () => {
     onSaveProfiles({
       trainer_1: {
         ...profiles.trainer_1,
         name: trainer1Name.trim() || "Trainer 1",
-        avatar: trainer1Avatar
+        avatar: trainer1Avatar,
+        customPin: trainer1Pin.trim() || undefined
       },
       trainer_2: {
         ...profiles.trainer_2,
         name: trainer2Name.trim() || "Trainer 2",
-        avatar: trainer2Avatar
+        avatar: trainer2Avatar,
+        customPin: trainer2Pin.trim() || undefined
       }
     });
     onClose();
@@ -179,6 +184,18 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
             placeholder="Name z.B. Ash"
             className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border-2 border-slate-200 text-sm text-slate-900 font-bold focus:outline-none focus:border-amber-500"
           />
+          <div className="flex items-center gap-2 pt-1">
+            <span className="text-xs text-slate-500 font-bold">PIN-Schutz (optional):</span>
+            <input
+              type="password"
+              inputMode="numeric"
+              maxLength={8}
+              value={trainer1Pin}
+              onChange={(e) => setTrainer1Pin(e.target.value)}
+              placeholder="z. B. 1234 (leer = kein PIN)"
+              className="w-44 px-2.5 py-1.5 rounded-xl bg-slate-50 border-2 border-slate-200 text-xs font-bold focus:outline-none focus:border-amber-500"
+            />
+          </div>
           <div className="flex flex-wrap gap-1.5 pt-1">
             {AVAILABLE_AVATARS.map((av) => (
               <button
@@ -206,9 +223,21 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
             type="text"
             value={trainer2Name}
             onChange={(e) => setTrainer2Name(e.target.value)}
-            placeholder="Name z.B. Gary"
+            placeholder="Name z.B. Misty"
             className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border-2 border-slate-200 text-sm text-slate-900 font-bold focus:outline-none focus:border-blue-500"
           />
+          <div className="flex items-center gap-2 pt-1">
+            <span className="text-xs text-slate-500 font-bold">PIN-Schutz (optional):</span>
+            <input
+              type="password"
+              inputMode="numeric"
+              maxLength={8}
+              value={trainer2Pin}
+              onChange={(e) => setTrainer2Pin(e.target.value)}
+              placeholder="z. B. 5678 (leer = kein PIN)"
+              className="w-44 px-2.5 py-1.5 rounded-xl bg-slate-50 border-2 border-slate-200 text-xs font-bold focus:outline-none focus:border-blue-500"
+            />
+          </div>
           <div className="flex flex-wrap gap-1.5 pt-1">
             {AVAILABLE_AVATARS.map((av) => (
               <button

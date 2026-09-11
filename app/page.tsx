@@ -8,6 +8,7 @@ import { EpisodeList } from "@/components/EpisodeList";
 import { EasyModeMobile } from "@/components/EasyModeMobile";
 import { EpisodeDetailModal } from "@/components/EpisodeDetailModal";
 import { ProfileEditModal } from "@/components/ProfileEditModal";
+import { PinLockModal } from "@/components/PinLockModal";
 import { SupabaseSetupModal } from "@/components/SupabaseSetupModal";
 import { PlaylistSyncModal } from "@/components/PlaylistSyncModal";
 import { PlaylistLinkModal } from "@/components/PlaylistLinkModal";
@@ -55,6 +56,7 @@ export default function Home() {
   const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
   const [isPlaylistModalOpen, setIsPlaylistModalOpen] = useState(false);
   const [isPlaylistLinkModalOpen, setIsPlaylistLinkModalOpen] = useState(false);
+  const [pendingTrainerPin, setPendingTrainerPin] = useState<TrainerId | null>(null);
 
   // Filters & Search
   const [filterMode, setFilterMode] = useState<FilterMode>("all");
@@ -267,11 +269,16 @@ export default function Home() {
   }, [episodes, watchState, activeTrainerId, showToast]);
 
   const handleSelectActiveTrainer = useCallback((id: TrainerId) => {
-    setActiveTrainerId(id);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("pokiwatch_active_trainer", id);
+    const target = profiles[id];
+    if (target?.customPin) {
+      setPendingTrainerPin(id);
+    } else {
+      setActiveTrainerId(id);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("pokiwatch_active_trainer", id);
+      }
     }
-  }, []);
+  }, [profiles]);
 
   const handleSaveProfiles = useCallback(
     (newProfiles: { trainer_1: TrainerProfile; trainer_2: TrainerProfile }) => {
@@ -544,6 +551,34 @@ export default function Home() {
           onSaved={(newId) => {
             setPlaylistId(newId);
             showToast("✅ YouTube-Playlist erfolgreich hinterlegt!");
+          }}
+        />
+      )}
+
+      {pendingTrainerPin && (
+        <PinLockModal
+          isOpen={Boolean(pendingTrainerPin)}
+          onClose={() => setPendingTrainerPin(null)}
+          targetTrainer={profiles[pendingTrainerPin]}
+          onSuccess={() => {
+            const nextId = pendingTrainerPin;
+            setActiveTrainerId(nextId);
+            if (typeof window !== "undefined") {
+              localStorage.setItem("pokiwatch_active_trainer", nextId);
+            }
+            showToast(`🔓 Als ${profiles[nextId].name} eingeloggt!`);
+            setPendingTrainerPin(null);
+          }}
+          onSetNewPin={(newPin) => {
+            const nextId = pendingTrainerPin;
+            const updated = {
+              ...profiles,
+              [nextId]: {
+                ...profiles[nextId],
+                customPin: newPin
+              }
+            };
+            handleSaveProfiles(updated);
           }}
         />
       )}

@@ -107,14 +107,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
 
-          {/* Supabase Status / Setup Button */}
+          {/* Supabase Status / Setup Button (Hidden for clean look, accessible via profile or settings) */}
           <button
             onClick={onOpenSupabaseModal}
-            className={`flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-xl text-xs font-bold transition-all shadow-sm ${
-              isSupabaseConnected
-                ? "bg-emerald-500 text-white border border-emerald-400 hover:bg-emerald-600"
-                : "bg-white/15 text-white border border-white/30 hover:bg-white/25"
-            }`}
+            className="hidden"
             title={isSupabaseConnected ? "Supabase Live-Sync aktiv" : "Klicke für Supabase Echtzeit-Sync"}
           >
             <Database className="w-3.5 h-3.5 flex-shrink-0" />
