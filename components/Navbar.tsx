@@ -170,12 +170,14 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Category Tab Bar (Episoden vs. Gemeinsamer Pokédex vs. Aktivität) */}
-      <div className="bg-red-900/60 backdrop-blur-md border-t border-red-500/30 px-3 sm:px-6 lg:px-8 py-1.5 shadow-inner">
-        <div className="max-w-7xl mx-auto flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-0.5">
-          
+      <div className="bg-red-900/60 backdrop-blur-md border-t border-red-500/30 px-2 sm:px-6 lg:px-8 py-1.5 shadow-inner">
+        <div
+          className="max-w-7xl mx-auto flex items-center justify-start sm:justify-start gap-1 sm:gap-2 overflow-x-auto scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-0.5"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
           <button
             onClick={() => onChangeTab("episodes")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all flex-shrink-0 ${
+            className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition-all flex-shrink-0 ${
               activeTab === "episodes"
                 ? "bg-white text-red-700 shadow-md scale-100"
                 : "text-white/90 hover:bg-white/10 hover:text-white"
@@ -186,14 +188,16 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={() => onChangeTab("pokedex")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all flex-shrink-0 ${
+            className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition-all flex-shrink-0 ${
               activeTab === "pokedex"
                 ? "bg-amber-400 text-slate-950 shadow-md scale-100"
                 : "text-white/90 hover:bg-white/10 hover:text-white"
             }`}
           >
             <PokedexIcon size="sm" />
-            <span>Gemeinsamer Pokédex</span>
+            <span>
+              <span className="hidden sm:inline">Gemeinsamer </span>Pokédex
+            </span>
             {typeof discoveredCount === "number" && (
               <span
                 className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${
@@ -210,7 +214,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={() => onChangeTab("activity")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all flex-shrink-0 ${
+            className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition-all flex-shrink-0 ${
               activeTab === "activity"
                 ? "bg-indigo-500 text-white shadow-md scale-100"
                 : "text-white/90 hover:bg-white/10 hover:text-white"

@@ -14,17 +14,34 @@ body {
   font-family: var(--font-outfit), var(--font-inter), system-ui, -apple-system, sans-serif;
 }
 
-/* Hide all scrollbars globally while keeping full scrolling functionality */
-* {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+/* Hide all scrollbars globally across all elements and browsers */
+*,
+*::before,
+*::after {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
 
+::-webkit-scrollbar,
 *::-webkit-scrollbar,
-::-webkit-scrollbar {
-  display: none;
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+div::-webkit-scrollbar {
+  display: none !important;
   width: 0px !important;
   height: 0px !important;
+  background: transparent !important;
+}
+
+::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  display: none !important;
+}
+
+::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track {
+  display: none !important;
+  background: transparent !important;
 }
 
 .scrollbar-none {
