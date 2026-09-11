@@ -371,35 +371,37 @@ export default function Home() {
     );
   }
 
-  // Not logged in to Main Account -> Show Gatekeeper Lock Screen
+  // Not logged in to Main Account -> Show Gatekeeper Lock Screen (Clean Light Pokeball Theme)
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-[#070a11] text-white flex flex-col items-center justify-center p-4 selection:bg-red-600 selection:text-white relative overflow-hidden">
-        {/* Background Aura */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] bg-red-600/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="min-h-screen bg-[#f8fafc] pokeball-bg-pattern text-slate-900 flex flex-col items-center justify-center p-4 selection:bg-red-600 selection:text-white relative overflow-hidden">
+        {/* Subtle decorative glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 w-full max-w-sm flex flex-col items-center text-center space-y-6 animate-in fade-in zoom-in-95 duration-300">
-          <PokeballLogo size="xl" className="hover:rotate-45 transition-transform duration-500" />
+        <div className="relative z-10 w-full max-w-sm flex flex-col items-center text-center space-y-6 animate-in fade-in zoom-in-95 duration-300 p-8 rounded-3xl bg-white border-2 border-slate-200 shadow-2xl">
+          <div className="p-3 rounded-2xl bg-red-50 border border-red-100 shadow-sm">
+            <PokeballLogo size="xl" className="hover:rotate-45 transition-transform duration-500" />
+          </div>
 
-          <div className="space-y-2">
-            <h1 className="text-3xl font-black tracking-tight text-white">
+          <div className="space-y-1.5">
+            <h1 className="text-3xl font-black tracking-tight text-slate-900">
               PokiWatch
             </h1>
-            <p className="text-xs text-slate-400 font-medium max-w-xs mx-auto">
-              Privater 2-Personen Pokémon Watch-Tracker. Bitte melde dich an, um Zugriff zu erhalten.
+            <p className="text-xs text-slate-500 font-bold max-w-xs mx-auto">
+              Privater 2-Personen Pokémon Watch-Tracker
             </p>
           </div>
 
           <button
             onClick={() => setIsAuthModalOpen(true)}
-            className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-sm shadow-xl shadow-red-950/50 transition active:scale-95"
+            className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-sm shadow-lg shadow-red-500/25 transition active:scale-95"
           >
-            <span>Jetzt Anmelden / Registrieren</span>
+            <span>Anmelden</span>
             <span className="text-base">➔</span>
           </button>
 
-          <p className="text-[11px] text-slate-500 font-semibold">
-            Geschützt für deine 2 Unterkonten (Ash & Misty)
+          <p className="text-[11px] text-slate-400 font-semibold">
+            Zugang nur für autorisierte Trainer
           </p>
         </div>
 
