@@ -12,10 +12,11 @@ interface NavbarProps {
     trainer_2: TrainerProfile;
   };
   activeTrainerId: TrainerId;
-  activeTab: "episodes" | "pokedex" | "activity";
-  onChangeTab: (tab: "episodes" | "pokedex" | "activity") => void;
+  activeTab: "episodes" | "pokedex" | "cards" | "activity";
+  onChangeTab: (tab: "episodes" | "pokedex" | "cards" | "activity") => void;
   discoveredCount?: number;
   totalPokemonCount?: number;
+  availablePacksCount?: number;
   onOpenProfileModal: () => void;
   onOpenSupabaseModal: () => void;
   onOpenPlaylistModal: () => void;
@@ -37,6 +38,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onChangeTab,
   discoveredCount,
   totalPokemonCount,
+  availablePacksCount,
   onOpenProfileModal,
   onOpenSupabaseModal,
   onOpenPlaylistModal,
@@ -194,6 +196,28 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 {discoveredCount}
                 {totalPokemonCount ? ` / ${totalPokemonCount}` : ""}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => onChangeTab("cards")}
+            className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black transition-all flex-shrink-0 ${
+              activeTab === "cards"
+                ? "bg-amber-400 text-slate-950 shadow-md scale-100"
+                : "text-white/90 hover:bg-white/10 hover:text-white"
+            }`}
+          >
+            <span>🎴 Karten & Packs</span>
+            {typeof availablePacksCount === "number" && availablePacksCount > 0 && (
+              <span
+                className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${
+                  activeTab === "cards"
+                    ? "bg-red-600 text-white animate-pulse"
+                    : "bg-amber-400 text-slate-950"
+                }`}
+              >
+                {availablePacksCount}
               </span>
             )}
           </button>

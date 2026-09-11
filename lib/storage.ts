@@ -1,4 +1,4 @@
-import { PokiWatchData, TrainerId, TrainerProfile, WatchStateMap } from '@/types';
+import { PokiWatchData, TrainerId, TrainerProfile, WatchStateMap, CardsState } from '@/types';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 
 export const DEFAULT_PROFILES: { trainer_1: TrainerProfile; trainer_2: TrainerProfile } = {
@@ -18,14 +18,37 @@ export const DEFAULT_PROFILES: { trainer_1: TrainerProfile; trainer_2: TrainerPr
   }
 };
 
+export const DEFAULT_CARDS_STATE: CardsState = {
+  openedPacksCount: {
+    trainer_1: 0,
+    trainer_2: 0
+  },
+  cards: {
+    trainer_1: [],
+    trainer_2: []
+  },
+  tradeOffers: []
+};
+
 /**
  * Return initial empty data – actual state is loaded from Supabase after login.
  */
-export function getInitialData(): PokiWatchData {
+export function getInitialData(): PokiWatchData & { cardsState?: CardsState } {
+  let cardsState = DEFAULT_CARDS_STATE;
+  if (typeof window !== 'undefined') {
+    try {
+      const savedCards = localStorage.getItem('pokiwatch_cards');
+      if (savedCards) {
+        cardsState = JSON.parse(savedCards);
+      }
+    } catch {}
+  }
+
   return {
     profiles: DEFAULT_PROFILES,
     activeTrainerId: 'trainer_1',
     watchState: {},
+    cardsState,
     lastUpdated: new Date().toISOString()
   };
 }
@@ -33,10 +56,13 @@ export function getInitialData(): PokiWatchData {
 /**
  * Save data locally to fallback storage (used for initial load before Supabase sync).
  */
-export function saveLocalData(data: PokiWatchData): void {
+export function saveLocalData(data: PokiWatchData & { cardsState?: CardsState }): void {
   if (typeof window !== 'undefined') {
     try {
       localStorage.setItem('pokiwatch_data', JSON.stringify(data));
+      if (data.cardsState) {
+        localStorage.setItem('pokiwatch_cards', JSON.stringify(data.cardsState));
+      }
     } catch (e) {
       console.warn('Failed to save data locally:', e);
     }
@@ -46,14 +72,18 @@ export function saveLocalData(data: PokiWatchData): void {
 /**
  * Fetch remote state from Supabase from the shared pokiwatch_state table.
  */
-export async function fetchRemoteState(): Promise<{ watchState: WatchStateMap; profiles?: { trainer_1: TrainerProfile; trainer_2: TrainerProfile } } | null> {
+export async function fetchRemoteState(): Promise<{
+  watchState: WatchStateMap;
+  profiles?: { trainer_1: TrainerProfile; trainer_2: TrainerProfile };
+  cardsState?: CardsState;
+} | null> {
   const supabase = getSupabaseClient();
   if (!supabase) return null;
 
   try {
     const { data, error } = await supabase
       .from('pokiwatch_state')
-      .select('watch_state, profiles')
+      .select('watch_state, profiles, cards_state')
       .eq('id', 'global_state')
       .maybeSingle();
 
@@ -66,7 +96,8 @@ export async function fetchRemoteState(): Promise<{ watchState: WatchStateMap; p
 
     return {
       watchState: data.watch_state || {},
-      profiles: data.profiles || undefined
+      profiles: data.profiles || undefined,
+      cardsState: data.cards_state || DEFAULT_CARDS_STATE
     };
   } catch (err) {
     console.warn('Supabase fetch error:', err);
@@ -77,7 +108,11 @@ export async function fetchRemoteState(): Promise<{ watchState: WatchStateMap; p
 /**
  * Push local state to Supabase in the shared pokiwatch_state table.
  */
-export async function pushRemoteState(watchState: WatchStateMap, profiles?: { trainer_1: TrainerProfile; trainer_2: TrainerProfile }) {
+export async function pushRemoteState(
+  watchState: WatchStateMap,
+  profiles?: { trainer_1: TrainerProfile; trainer_2: TrainerProfile },
+  cardsState?: CardsState
+) {
   const supabase = getSupabaseClient();
   if (!supabase) return false;
 
@@ -88,6 +123,7 @@ export async function pushRemoteState(watchState: WatchStateMap, profiles?: { tr
       updated_at: new Date().toISOString()
     };
     if (profiles) payload.profiles = profiles;
+    if (cardsState) payload.cards_state = cardsState;
 
     const { error } = await supabase
       .from('pokiwatch_state')
@@ -103,4 +139,5 @@ export async function pushRemoteState(watchState: WatchStateMap, profiles?: { tr
     return false;
   }
 }
+
 
